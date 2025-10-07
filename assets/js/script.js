@@ -205,7 +205,7 @@ async function renderResults() {
   } else {
     // API mode
     try {
-      const apiUrl = `http://localhost:4000/?q=${encodeURIComponent(ingredients)}`;
+      const apiUrl = getApiUrl(ingredients);
       const response = await fetch(apiUrl);
       const apiRecipes = await response.json();
       
