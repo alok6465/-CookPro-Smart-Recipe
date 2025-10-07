@@ -18,10 +18,7 @@ Netflix-inspired Indian recipe platform with AI-powered ingredient matching and 
 - **Icons**: Font Awesome
 
 ## 🚀 Live Demo
-[View Live Website](https://your-domain.com)
-
-## 📱 Screenshots
-![Homepage](screenshot.png)
+[View Live Website](https://alok6465.github.io/-CookPro-Smart-Recipe/index.html)
 
 ## 🔧 Installation
 1. Clone repository
