@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover Recipes - CookPro</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">🍛</span>
+        <span class="logo-text">CookPro</span>
+      </a>
+      
+      <div class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+        <a href="ingredients.html" class="nav-link active">
+          <i class="fas fa-search"></i>
+          <span>Discover</span>
+        </a>
+        <a href="results.html" class="nav-link">
+          <i class="fas fa-utensils"></i>
+          <span>Recipes</span>
+        </a>
+        <a href="saved.html" class="nav-link">
+          <i class="fas fa-bookmark"></i>
+          <span>My List</span>
+        </a>
+        <a href="reviews.html" class="nav-link">
+          <i class="fas fa-star"></i>
+          <span>Reviews</span>
+        </a>
+        <a href="premium.html" class="nav-link">
+          <i class="fas fa-crown"></i>
+          <span>Premium</span>
+        </a>
+      </div>
+      
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main style="padding-top: 100px; min-height: 100vh;">
+    <div class="container">
+      <!-- Hero Section -->
+      <section style="text-align: center; padding: 4rem 0;">
+        <h1 style="font-family: 'Poppins', sans-serif; font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+          Discover Your Perfect Recipe
+        </h1>
+        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+          Tell us what ingredients you have, and our AI will find the perfect Indian recipes for you
+        </p>
+      </section>
+
+      <!-- Quick Order Section -->
+      <section style="background: var(--bg-card); padding: 2rem; border-radius: var(--border-radius); margin-bottom: 3rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <h3 style="color: var(--text-primary); margin-bottom: 1rem;">
+            <i class="fas fa-shopping-cart"></i> Need Ingredients?
+          </h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Order fresh ingredients in just 10 minutes</p>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+          <a href="https://www.zeptonow.com/" target="_blank" class="btn btn-outline">
+            <i class="fas fa-shopping-bag"></i> Zepto
+          </a>
+          <a href="https://blinkit.com/" target="_blank" class="btn btn-outline">
+            <i class="fas fa-truck"></i> Blinkit
+          </a>
+          <a href="https://www.swiggy.com/instamart" target="_blank" class="btn btn-outline">
+            <i class="fas fa-leaf"></i> Instamart
+          </a>
+        </div>
+      </section>
+
+      <!-- Ingredient Input Section -->
+      <section style="max-width: 800px; margin: 0 auto;">
+        <div style="background: var(--bg-card); padding: 3rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 3rem; border: 1px solid rgba(255, 255, 255, 0.1); position: relative; overflow: hidden;">
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gradient-primary);"></div>
+          
+          <form id="ingredientForm">
+            <div class="form-group">
+              <label for="ingredients" class="form-label">
+                <i class="fas fa-seedling"></i> Your Available Ingredients
+              </label>
+              <input type="text" id="ingredients" placeholder="e.g., आलू (potato), प्याज (onion), टमाटर (tomato), दही (curd)" required>
+              <small style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; display: block;">
+                <i class="fas fa-info-circle"></i> Separate ingredients with commas. You can use Hindi or English names!
+              </small>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+              <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 1.2rem 2.5rem;">
+                <i class="fas fa-search"></i> Find Recipes
+              </button>
+              <button type="button" id="smartBtn" class="btn btn-outline" style="font-size: 1.1rem; padding: 1.2rem 2.5rem;">
+                <i class="fas fa-magic"></i> AI Smart Match
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Popular Ingredients -->
+        <div style="text-align: center;">
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 2rem; color: var(--text-primary); margin-bottom: 2rem;">
+            <i class="fas fa-fire"></i> Popular Ingredients
+          </h3>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+            <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1); transition: var(--transition);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+              <h4 style="color: var(--accent); margin-bottom: 1rem; font-weight: 600;">
+                <i class="fas fa-carrot"></i> Vegetables
+              </h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
+                <span class="tag" onclick="addIngredient('आलू')">🥔 आलू</span>
+                <span class="tag" onclick="addIngredient('प्याज')">🧅 प्याज</span>
+                <span class="tag" onclick="addIngredient('टमाटर')">🍅 टमाटर</span>
+                <span class="tag" onclick="addIngredient('गोभी')">🥬 गोभी</span>
+                <span class="tag" onclick="addIngredient('भिंडी')">🌶️ भिंडी</span>
+              </div>
+            </div>
+            
+            <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1); transition: var(--transition);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+              <h4 style="color: var(--accent); margin-bottom: 1rem; font-weight: 600;">
+                <i class="fas fa-cheese"></i> Dairy & Grains
+              </h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
+                <span class="tag" onclick="addIngredient('दही')">🥛 दही</span>
+                <span class="tag" onclick="addIngredient('चावल')">🍚 चावल</span>
+                <span class="tag" onclick="addIngredient('दाल')">🫘 दाल</span>
+                <span class="tag" onclick="addIngredient('पनीर')">🧀 पनीर</span>
+                <span class="tag" onclick="addIngredient('दूध')">🥛 दूध</span>
+              </div>
+            </div>
+            
+            <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1); transition: var(--transition);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+              <h4 style="color: var(--accent); margin-bottom: 1rem; font-weight: 600;">
+                <i class="fas fa-pepper-hot"></i> Spices & Herbs
+              </h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
+                <span class="tag" onclick="addIngredient('हल्दी')">🟡 हल्दी</span>
+                <span class="tag" onclick="addIngredient('जीरा')">🟤 जीरा</span>
+                <span class="tag" onclick="addIngredient('धनिया')">🌿 धनिया</span>
+                <span class="tag" onclick="addIngredient('अदरक')">🫚 अदरक</span>
+                <span class="tag" onclick="addIngredient('लहसुन')">🧄 लहसुन</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🍛</span>
+            <span class="logo-text">CookPro</span>
+          </div>
+          <p>Your premium gateway to authentic Indian cuisine</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-section">
+            <h4>Discover</h4>
+            <a href="ingredients.html">Find Recipes</a>
+            <a href="results.html">Browse All</a>
+            <a href="saved.html">My Recipes</a>
+          </div>
+          <div class="footer-section">
+            <h4>Community</h4>
+            <a href="reviews.html">Reviews</a>
+            <a href="#">Blog</a>
+            <a href="#">Support</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 CookPro by Alok Tiwari | Made with ❤️ for Indian Food Lovers</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/pdf-generator.js"></script>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+<!-- App Scripts -->
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/firebase-auth.js"></script>
+<script src="assets/js/script.js"></script>
+
+</body>
+</html>

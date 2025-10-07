@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Features - CookPro</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">🍛</span>
+        <span class="logo-text">CookPro</span>
+      </a>
+      
+      <div class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+        <a href="ingredients.html" class="nav-link">
+          <i class="fas fa-search"></i>
+          <span>Discover</span>
+        </a>
+        <a href="results.html" class="nav-link">
+          <i class="fas fa-utensils"></i>
+          <span>Recipes</span>
+        </a>
+        <a href="saved.html" class="nav-link">
+          <i class="fas fa-bookmark"></i>
+          <span>My List</span>
+        </a>
+        <a href="reviews.html" class="nav-link">
+          <i class="fas fa-star"></i>
+          <span>Reviews</span>
+        </a>
+        <a href="premium.html" class="nav-link active">
+          <i class="fas fa-crown"></i>
+          <span>Premium</span>
+        </a>
+      </div>
+      
+      <div class="nav-auth" id="navAuth">
+        <div class="user-menu" id="userMenu" style="display: none;">
+          <div class="user-avatar" onclick="toggleUserDropdown()">
+            <i class="fas fa-user-circle"></i>
+            <span id="userName">User</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <a href="#" onclick="viewProfile()"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" onclick="viewSettings()"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="loginBtn" onclick="openAuthModal()">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+      </div>
+      
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main style="padding-top: 80px; min-height: 100vh;">
+    <div class="container">
+      <!-- Hero Section -->
+      <section style="text-align: center; padding: 4rem 0;">
+        <h1 style="font-family: 'Poppins', sans-serif; font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+          🌟 Premium Features
+        </h1>
+        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+          Unlock the full potential of CookPro with our premium features
+        </p>
+      </section>
+
+      <!-- Premium Features Grid -->
+      <section class="features">
+        <div class="features-grid">
+          <div class="feature-card feature-premium">
+            <div class="feature-icon">
+              <i class="fas fa-file-pdf"></i>
+            </div>
+            <h3>PDF Recipe Downloads</h3>
+            <p>Download beautifully formatted PDF recipes with ingredients, instructions, and nutritional information.</p>
+            <button class="btn btn-primary" onclick="demonstratePDF()">
+              <i class="fas fa-download"></i> Try PDF Download
+            </button>
+          </div>
+          
+          <div class="feature-card feature-premium">
+            <div class="feature-icon">
+              <i class="fas fa-shopping-list"></i>
+            </div>
+            <h3>Smart Shopping Lists</h3>
+            <p>Generate organized shopping lists from your recipes with quantity calculations and store categories.</p>
+            <button class="btn btn-primary" onclick="generateSampleShoppingList()">
+              <i class="fas fa-list"></i> Generate List
+            </button>
+          </div>
+          
+          <div class="feature-card feature-premium">
+            <div class="feature-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3>Meal Planning</h3>
+            <p>Plan your weekly meals with our intelligent meal planner and get automated shopping lists.</p>
+            <button class="btn btn-primary" onclick="openMealPlanner()">
+              <i class="fas fa-calendar"></i> Plan Meals
+            </button>
+          </div>
+          
+          <div class="feature-card feature-premium">
+            <div class="feature-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Nutrition Tracking</h3>
+            <p>Track your daily nutrition intake with detailed analysis of calories, proteins, and vitamins.</p>
+            <button class="btn btn-primary" onclick="showNutritionDemo()">
+              <i class="fas fa-chart-pie"></i> View Analytics
+            </button>
+          </div>
+          
+          <div class="feature-card feature-premium">
+            <div class="feature-icon">
+              <i class="fas fa-microphone"></i>
+            </div>
+            <h3>Voice Commands</h3>
+            <p>Cook hands-free with voice-activated recipe reading and timer controls.</p>
+            <button class="btn btn-primary" onclick="testVoiceFeature()">
+              <i class="fas fa-microphone"></i> Try Voice
+            </button>
+          </div>
+          
+          <div class="feature-card feature-premium">
+            <div class="feature-icon">
+              <i class="fas fa-crown"></i>
+            </div>
+            <h3>Exclusive Recipes</h3>
+            <p>Access premium recipes from celebrity chefs and traditional family collections.</p>
+            <button class="btn btn-primary" onclick="showPremiumRecipes()">
+              <i class="fas fa-star"></i> Explore Premium
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing Section -->
+      <section style="padding: 4rem 0;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 2.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
+            Choose Your Plan
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 1.1rem;">Unlock premium features and enhance your cooking experience</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto;">
+          <!-- Free Plan -->
+          <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+            <h3 style="font-size: 1.5rem; color: var(--text-primary); margin-bottom: 1rem;">Free</h3>
+            <div style="font-size: 3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 1rem;">₹0</div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Perfect for beginners</p>
+            <ul style="list-style: none; padding: 0; margin-bottom: 2rem; text-align: left;">
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Basic recipes</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Ingredient matching</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Save recipes</li>
+            </ul>
+            <button class="btn btn-outline" style="width: 100%;" onclick="window.location.href='index.html'">Current Plan</button>
+          </div>
+          
+          <!-- Premium Plan -->
+          <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--border-radius); border: 2px solid var(--accent); text-align: center; position: relative; transform: scale(1.05);">
+            <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 0.5rem 2rem; border-radius: 25px; font-size: 0.8rem; font-weight: 600;">POPULAR</div>
+            <h3 style="font-size: 1.5rem; color: var(--text-primary); margin-bottom: 1rem;">Premium</h3>
+            <div style="font-size: 3rem; font-weight: 800; color: var(--accent); margin-bottom: 1rem;">₹299<span style="font-size: 1rem; color: var(--text-secondary);">/month</span></div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">For serious home cooks</p>
+            <ul style="list-style: none; padding: 0; margin-bottom: 2rem; text-align: left;">
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Everything in Free</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> PDF downloads</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Meal planning</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Nutrition tracking</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Voice commands</li>
+            </ul>
+            <button class="btn btn-primary" style="width: 100%;" onclick="upgradeToPremium()">Upgrade Now</button>
+          </div>
+          
+          <!-- Pro Plan -->
+          <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+            <h3 style="font-size: 1.5rem; color: var(--text-primary); margin-bottom: 1rem;">Pro</h3>
+            <div style="font-size: 3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 1rem;">₹599<span style="font-size: 1rem; color: var(--text-secondary);">/month</span></div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">For culinary professionals</p>
+            <ul style="list-style: none; padding: 0; margin-bottom: 2rem; text-align: left;">
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Everything in Premium</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Exclusive recipes</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Chef consultations</li>
+              <li style="padding: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-check" style="color: var(--accent); margin-right: 0.5rem;"></i> Priority support</li>
+            </ul>
+            <button class="btn btn-outline" style="width: 100%;" onclick="upgradeToPro()">Choose Pro</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🍛</span>
+            <span class="logo-text">CookPro</span>
+          </div>
+          <p>Your premium gateway to authentic Indian cuisine</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-section">
+            <h4>Premium</h4>
+            <a href="premium.html">Features</a>
+            <a href="#">Pricing</a>
+            <a href="#">Upgrade</a>
+          </div>
+          <div class="footer-section">
+            <h4>Support</h4>
+            <a href="#">Help Center</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 CookPro by Alok Tiwari | Made with ❤️ for Indian Food Lovers</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/pdf-generator.js"></script>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+<!-- App Scripts -->
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/firebase-auth.js"></script>
+<script src="assets/js/script.js"></script>
+
+  <script>
+    function demonstratePDF() {
+      const sampleRecipe = {
+        name: "Butter Chicken",
+        time: "45 mins",
+        ingredients: ["500g chicken", "200ml cream", "2 tbsp butter", "1 onion", "3 tomatoes", "Spices"],
+        steps: ["Marinate chicken", "Cook onions", "Add tomatoes", "Add chicken", "Simmer with cream"],
+        benefits: "Rich in protein and calcium. This creamy dish provides essential nutrients for muscle building."
+      };
+      
+      if (window.pdfGenerator) {
+        window.pdfGenerator.generateRecipePDF(sampleRecipe);
+      } else {
+        showSuccessMessage('PDF feature is loading... Please try again in a moment!');
+      }
+    }
+    
+    function generateSampleShoppingList() {
+      const sampleIngredients = ["Chicken 500g", "Heavy Cream 200ml", "Butter 100g", "Onions 2 pcs", "Tomatoes 3 pcs", "Garam Masala", "Turmeric", "Red Chili Powder"];
+      
+      if (window.pdfGenerator) {
+        window.pdfGenerator.generateShoppingListPDF(sampleIngredients);
+      } else {
+        showSuccessMessage('Shopping list feature is loading... Please try again!');
+      }
+    }
+    
+    function openMealPlanner() {
+      if (window.pdfGenerator) {
+        window.pdfGenerator.generateMealPlanPDF();
+      } else {
+        showSuccessMessage('Meal planner template downloaded! 📅');
+      }
+    }
+    
+    function showNutritionDemo() {
+      showSuccessMessage('Nutrition tracking: 2,150 calories, 85g protein, 45g fiber today! 📊');
+    }
+    
+    function testVoiceFeature() {
+      showSuccessMessage('Voice feature: "Hey CookPro, read me the next step!" 🎤');
+    }
+    
+    function showPremiumRecipes() {
+      showSuccessMessage('Premium recipes from celebrity chefs coming soon! ⭐');
+    }
+    
+    function upgradeToPremium() {
+      showSuccessMessage('Premium upgrade coming soon! Get ready for amazing features! 🌟');
+    }
+    
+    function upgradeToPro() {
+      showSuccessMessage('Pro plan upgrade coming soon! Professional cooking awaits! 👨‍🍳');
+    }
+  </script>
+</body>
+</html>

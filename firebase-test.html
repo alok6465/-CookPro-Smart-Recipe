@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Test - CookPro</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: white;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .test-section {
+      background: #2a2a2a;
+      padding: 2rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+    }
+    button {
+      background: #e50914;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 0.5rem;
+      font-size: 1rem;
+    }
+    button:hover {
+      background: #f40612;
+    }
+    input {
+      background: #1a1a1a;
+      color: white;
+      border: 1px solid #444;
+      padding: 0.75rem;
+      border-radius: 5px;
+      margin: 0.5rem;
+      width: 200px;
+    }
+    .result {
+      background: #1a1a1a;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 5px;
+      border-left: 4px solid #e50914;
+    }
+    .success { border-left-color: #46d369; }
+    .error { border-left-color: #ff4444; }
+  </style>
+</head>
+<body>
+  <h1>🔥 Firebase Database Test</h1>
+  <p>Use this page to test if Firebase is working correctly</p>
+
+  <!-- Connection Test -->
+  <div class="test-section">
+    <h2>1. Firebase Connection Test</h2>
+    <button onclick="testConnection()">Test Firebase Connection</button>
+    <div id="connectionResult" class="result" style="display: none;"></div>
+  </div>
+
+  <!-- Authentication Test -->
+  <div class="test-section">
+    <h2>2. Authentication Test</h2>
+    <div>
+      <input type="email" id="testEmail" placeholder="test@example.com" value="test@cookpro.com">
+      <input type="password" id="testPassword" placeholder="password" value="test123456">
+      <input type="text" id="testName" placeholder="Full Name" value="Test User">
+    </div>
+    <div>
+      <button onclick="testSignUp()">Test Sign Up</button>
+      <button onclick="testSignIn()">Test Sign In</button>
+      <button onclick="testSignOut()">Test Sign Out</button>
+    </div>
+    <div id="authResult" class="result" style="display: none;"></div>
+  </div>
+
+  <!-- Database Test -->
+  <div class="test-section">
+    <h2>3. Database Test</h2>
+    <div>
+      <input type="text" id="testRecipeName" placeholder="Recipe Name" value="Test Biryani">
+      <input type="text" id="testIngredients" placeholder="Ingredients" value="Rice, Chicken, Spices">
+    </div>
+    <div>
+      <button onclick="testSaveRecipe()">Test Save Recipe</button>
+      <button onclick="testLoadRecipes()">Test Load Recipes</button>
+      <button onclick="testDeleteRecipe()">Test Delete Recipe</button>
+    </div>
+    <div id="dbResult" class="result" style="display: none;"></div>
+  </div>
+
+  <!-- Current User Info -->
+  <div class="test-section">
+    <h2>4. Current User Info</h2>
+    <button onclick="showUserInfo()">Show User Info</button>
+    <div id="userInfo" class="result" style="display: none;"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- App Scripts -->
+  <script src="assets/js/firebase-config.js"></script>
+
+  <script>
+    let testRecipeId = null;
+
+    // Test Firebase Connection
+    function testConnection() {
+      const result = document.getElementById('connectionResult');
+      result.style.display = 'block';
+      
+      try {
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+          result.className = 'result success';
+          result.innerHTML = '✅ Firebase Connected Successfully!<br>App Name: ' + firebase.app().name;
+        } else {
+          result.className = 'result error';
+          result.innerHTML = '❌ Firebase Not Connected';
+        }
+      } catch (error) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Error: ' + error.message;
+      }
+    }
+
+    // Test Sign Up
+    async function testSignUp() {
+      const result = document.getElementById('authResult');
+      result.style.display = 'block';
+      
+      const email = document.getElementById('testEmail').value;
+      const password = document.getElementById('testPassword').value;
+      const name = document.getElementById('testName').value;
+      
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await userCredential.user.updateProfile({ displayName: name });
+        
+        // Save to Firestore
+        await db.collection('users').doc(userCredential.user.uid).set({
+          name: name,
+          email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        result.className = 'result success';
+        result.innerHTML = '✅ Sign Up Successful!<br>User ID: ' + userCredential.user.uid;
+      } catch (error) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Sign Up Error: ' + error.message;
+      }
+    }
+
+    // Test Sign In
+    async function testSignIn() {
+      const result = document.getElementById('authResult');
+      result.style.display = 'block';
+      
+      const email = document.getElementById('testEmail').value;
+      const password = document.getElementById('testPassword').value;
+      
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        result.className = 'result success';
+        result.innerHTML = '✅ Sign In Successful!<br>User: ' + userCredential.user.email;
+      } catch (error) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Sign In Error: ' + error.message;
+      }
+    }
+
+    // Test Sign Out
+    async function testSignOut() {
+      const result = document.getElementById('authResult');
+      result.style.display = 'block';
+      
+      try {
+        await auth.signOut();
+        result.className = 'result success';
+        result.innerHTML = '✅ Sign Out Successful!';
+      } catch (error) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Sign Out Error: ' + error.message;
+      }
+    }
+
+    // Test Save Recipe
+    async function testSaveRecipe() {
+      const result = document.getElementById('dbResult');
+      result.style.display = 'block';
+      
+      const user = auth.currentUser;
+      if (!user) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Please sign in first';
+        return;
+      }
+      
+      const recipeName = document.getElementById('testRecipeName').value;
+      const ingredients = document.getElementById('testIngredients').value;
+      
+      try {
+        testRecipeId = Date.now().toString();
+        await db.collection('users').doc(user.uid).collection('savedRecipes').doc(testRecipeId).set({
+          name: recipeName,
+          ingredients: ingredients,
+          savedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        result.className = 'result success';
+        result.innerHTML = '✅ Recipe Saved Successfully!<br>Recipe ID: ' + testRecipeId;
+      } catch (error) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Save Error: ' + error.message;
+      }
+    }
+
+    // Test Load Recipes
+    async function testLoadRecipes() {
+      const result = document.getElementById('dbResult');
+      result.style.display = 'block';
+      
+      const user = auth.currentUser;
+      if (!user) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Please sign in first';
+        return;
+      }
+      
+      try {
+        const snapshot = await db.collection('users').doc(user.uid).collection('savedRecipes').get();
+        const recipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        result.className = 'result success';
+        result.innerHTML = '✅ Recipes Loaded Successfully!<br>Count: ' + recipes.length + '<br>Data: ' + JSON.stringify(recipes, null, 2);
+      } catch (error) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Load Error: ' + error.message;
+      }
+    }
+
+    // Test Delete Recipe
+    async function testDeleteRecipe() {
+      const result = document.getElementById('dbResult');
+      result.style.display = 'block';
+      
+      const user = auth.currentUser;
+      if (!user || !testRecipeId) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Please save a recipe first';
+        return;
+      }
+      
+      try {
+        await db.collection('users').doc(user.uid).collection('savedRecipes').doc(testRecipeId).delete();
+        
+        result.className = 'result success';
+        result.innerHTML = '✅ Recipe Deleted Successfully!';
+        testRecipeId = null;
+      } catch (error) {
+        result.className = 'result error';
+        result.innerHTML = '❌ Delete Error: ' + error.message;
+      }
+    }
+
+    // Show User Info
+    function showUserInfo() {
+      const result = document.getElementById('userInfo');
+      result.style.display = 'block';
+      
+      const user = auth.currentUser;
+      if (user) {
+        result.className = 'result success';
+        result.innerHTML = `
+          ✅ User Logged In:<br>
+          Email: ${user.email}<br>
+          Name: ${user.displayName || 'Not set'}<br>
+          UID: ${user.uid}<br>
+          Created: ${user.metadata.creationTime}
+        `;
+      } else {
+        result.className = 'result error';
+        result.innerHTML = '❌ No user logged in';
+      }
+    }
+
+    // Auto-test connection on load
+    window.onload = function() {
+      setTimeout(testConnection, 1000);
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CookPro - Premium Indian Recipe Platform</title>
+  
+  <meta name="description" content="Premium Indian Recipe Experience with Dark Theme UI">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">🍛</span>
+        <span class="logo-text">CookPro</span>
+      </a>
+      
+      <div class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link active">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+        <a href="ingredients.html" class="nav-link">
+          <i class="fas fa-search"></i>
+          <span>Discover</span>
+        </a>
+        <a href="results.html" class="nav-link">
+          <i class="fas fa-utensils"></i>
+          <span>Recipes</span>
+        </a>
+        <a href="saved.html" class="nav-link">
+          <i class="fas fa-bookmark"></i>
+          <span>My List</span>
+        </a>
+        <a href="reviews.html" class="nav-link">
+          <i class="fas fa-star"></i>
+          <span>Reviews</span>
+        </a>
+        <a href="premium.html" class="nav-link">
+          <i class="fas fa-crown"></i>
+          <span>Premium</span>
+        </a>
+      </div>
+      
+      <div class="nav-auth" id="navAuth">
+        <div class="user-menu" id="userMenu" style="display: none;">
+          <div class="user-avatar" onclick="toggleUserDropdown()">
+            <i class="fas fa-user-circle"></i>
+            <span id="userName">User</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <a href="#" onclick="viewProfile()"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" onclick="viewSettings()"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="loginBtn" onclick="openAuthModal()">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+      </div>
+      
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" style="padding-top: 80px;">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            <span class="title-line">CookPro: Smart Recipe</span>
+            <span class="title-line highlight">Smarter Recipe. Better Meals</span>
+          </h1>
+          <p class="hero-subtitle">
+            Discover thousands of authentic Indian recipes with AI-powered ingredient matching. 
+            From traditional family recipes to modern fusion cuisine.
+          </p>
+          <div class="hero-buttons">
+            <a href="ingredients.html" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Start Cooking
+            </a>
+            <a href="results.html" class="btn btn-outline">
+              <i class="fas fa-info-circle"></i>
+              Learn More
+            </a>
+          </div>
+        </div>
+        
+        <div class="hero-visual">
+          <div class="recipe-showcase showcase-1">
+            <div class="recipe-mini">
+              <span class="recipe-emoji">🍛</span>
+              <div class="recipe-info">
+                <h4>Hyderabadi Biryani</h4>
+                <p>Authentic royal recipe</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="recipe-showcase showcase-2">
+            <div class="recipe-mini">
+              <span class="recipe-emoji">🍜</span>
+              <div class="recipe-info">
+                <h4>Dal Makhani</h4>
+                <p>Creamy lentil curry</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="recipe-showcase showcase-3">
+            <div class="recipe-mini">
+              <span class="recipe-emoji">🥘</span>
+              <div class="recipe-info">
+                <h4>Paneer Butter Masala</h4>
+                <p>Rich tomato gravy</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number" data-count="2500">0</div>
+          <div class="stat-label">Premium Recipes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-count="28">0</div>
+          <div class="stat-label">Indian States</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-count="50000">0</div>
+          <div class="stat-label">Happy Cooks</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-count="24">0</div>
+          <div class="stat-label">Hours Support</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Today's Menu Section -->
+  <section class="todays-menu" style="padding: 4rem 0; background: var(--bg-primary);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Today's Menu</h2>
+        <p class="section-subtitle">Fresh vegetarian recipes curated daily for your perfect meals</p>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        <!-- Breakfast -->
+        <div class="meal-card" style="background: var(--bg-card); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.1); transition: var(--transition); cursor: pointer;" onclick="viewTodaysRecipe('breakfast')">
+          <div style="height: 150px; background: linear-gradient(135deg, #ff9a56, #ff6b35); display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative;">
+            🌅
+            <div style="position: absolute; top: 1rem; left: 1rem; background: rgba(0,0,0,0.7); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Breakfast</div>
+          </div>
+          <div style="padding: 1.5rem;">
+            <h3 id="breakfastTitle" style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Loading...</h3>
+            <p id="breakfastDesc" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">Preparing your morning delight...</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="breakfastTime" style="color: var(--accent); font-weight: 500;">⏱️ -- mins</span>
+              <span style="background: var(--accent); color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem;">🌱 Vegetarian</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Lunch -->
+        <div class="meal-card" style="background: var(--bg-card); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.1); transition: var(--transition); cursor: pointer;" onclick="viewTodaysRecipe('lunch')">
+          <div style="height: 150px; background: linear-gradient(135deg, #4ecdc4, #44a08d); display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative;">
+            ☀️
+            <div style="position: absolute; top: 1rem; left: 1rem; background: rgba(0,0,0,0.7); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Lunch</div>
+          </div>
+          <div style="padding: 1.5rem;">
+            <h3 id="lunchTitle" style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Loading...</h3>
+            <p id="lunchDesc" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">Preparing your afternoon feast...</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="lunchTime" style="color: var(--accent); font-weight: 500;">⏱️ -- mins</span>
+              <span style="background: var(--accent); color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem;">🌱 Vegetarian</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Dinner -->
+        <div class="meal-card" style="background: var(--bg-card); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.1); transition: var(--transition); cursor: pointer;" onclick="viewTodaysRecipe('dinner')">
+          <div style="height: 150px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative;">
+            🌙
+            <div style="position: absolute; top: 1rem; left: 1rem; background: rgba(0,0,0,0.7); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Dinner</div>
+          </div>
+          <div style="padding: 1.5rem;">
+            <h3 id="dinnerTitle" style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Loading...</h3>
+            <p id="dinnerDesc" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">Preparing your evening comfort...</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="dinnerTime" style="color: var(--accent); font-weight: 500;">⏱️ -- mins</span>
+              <span style="background: var(--accent); color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem;">🌱 Vegetarian</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 3rem;">
+        <button onclick="refreshTodaysMenu()" class="btn btn-outline" style="margin-right: 1rem;">
+          <i class="fas fa-sync-alt"></i> Refresh Menu
+        </button>
+        <a href="results.html" class="btn btn-primary">
+          <i class="fas fa-utensils"></i> View All Recipes
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Why Choose CookPro?</h2>
+        <p class="section-subtitle">Experience the future of Indian cooking with our premium features</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-robot"></i>
+          </div>
+          <h3>AI Recipe Matching</h3>
+          <p>Our advanced AI algorithm analyzes your ingredients and suggests perfect recipe combinations with detailed nutritional information.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-map-marked-alt"></i>
+          </div>
+          <h3>Regional Authenticity</h3>
+          <p>Explore authentic recipes from every corner of India, curated by local chefs and home cooks with generations of experience.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-video"></i>
+          </div>
+          <h3>HD Video Tutorials</h3>
+          <p>Learn from professional chefs with step-by-step HD video tutorials, slow-motion techniques, and expert cooking tips.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-heart"></i>
+          </div>
+          <h3>Health & Nutrition</h3>
+          <p>Get detailed nutritional analysis, dietary recommendations, and healthy alternatives for every recipe in our database.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>Community Driven</h3>
+          <p>Join a vibrant community of food enthusiasts, share your creations, and discover new recipes from fellow home cooks.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3>Smart Features</h3>
+          <p>Voice commands, smart shopping lists, meal planning, and personalized recommendations powered by machine learning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Comments Section -->
+  <section class="recent-comments" style="padding: 4rem 0; background: var(--bg-secondary);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Recent Comments</h2>
+        <p class="section-subtitle">See what our community is saying about recipes</p>
+      </div>
+      
+      <div style="overflow-x: auto; margin-top: 3rem; padding-bottom: 10px;" class="comments-scroll">
+        <div id="recentCommentsList" style="display: flex; gap: 1.5rem; min-width: max-content;">
+          <div class="loading-spinner" style="text-align: center; padding: 2rem;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent);"></i>
+            <p style="color: var(--text-secondary); margin-top: 1rem;">Loading recent comments...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact" style="padding: 4rem 0; background: var(--bg-primary);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Get in Touch</h2>
+        <p class="section-subtitle">Need help or have questions? We're here to assist you!</p>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 800px; margin: 0 auto;">
+        <div style="text-align: center; padding: 2rem; background: var(--bg-card); border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📧</div>
+          <h3 style="color: var(--text-primary); margin-bottom: 1rem;">Contact Support</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 2rem;">Have questions about recipes, features, or need technical help? Our support team is ready to assist you.</p>
+          <a href="contact.html" class="btn btn-primary">
+            <i class="fas fa-envelope"></i> Contact Us
+          </a>
+        </div>
+        
+        <div style="text-align: center; padding: 2rem; background: var(--bg-card); border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">❓</div>
+          <h3 style="color: var(--text-primary); margin-bottom: 1rem;">FAQ & Help</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 2rem;">Find quick answers to common questions about using CookPro, saving recipes, and premium features.</p>
+          <a href="contact.html#faq" class="btn btn-outline">
+            <i class="fas fa-question-circle"></i> View FAQ
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about" style="padding: 5rem 0; background: var(--bg-primary);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">About CookPro</h2>
+        <p class="section-subtitle">Your trusted companion for authentic Indian cooking</p>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+        <div class="about-card" style="background: var(--bg-card); border-radius: var(--border-radius); padding: 2rem; border: 1px solid rgba(255, 255, 255, 0.1); transition: var(--transition); cursor: pointer; position: relative; overflow: hidden;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='var(--shadow-hover)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow)'">
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gradient-primary);"></div>
+          <div style="font-size: 3rem; margin-bottom: 1rem; text-align: center;">📖</div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); text-align: center;">Our Story</h3>
+          <p style="color: var(--text-secondary); line-height: 1.6; text-align: center;">
+            CookPro was born from a passion for preserving India's rich culinary heritage. Created by <strong style="color: var(--accent);">Alok Tiwari</strong>, we combine traditional recipes with modern technology.
+          </p>
+        </div>
+        
+        <div class="about-card" style="background: var(--bg-card); border-radius: var(--border-radius); padding: 2rem; border: 1px solid rgba(255, 255, 255, 0.1); transition: var(--transition); cursor: pointer; position: relative; overflow: hidden;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='var(--shadow-hover)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow)'">
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gradient-primary);"></div>
+          <div style="font-size: 3rem; margin-bottom: 1rem; text-align: center;">🍛</div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); text-align: center;">2,500+ Recipes</h3>
+          <p style="color: var(--text-secondary); line-height: 1.6; text-align: center;">
+            From street food favorites to royal delicacies, we've curated recipes from all 28 Indian states, ensuring every dish tells a story.
+          </p>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+        <div style="text-align: center; padding: 1.5rem; background: var(--bg-card); border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gradient-primary);"></div>
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+          <h4 style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Our Mission</h4>
+          <p style="color: var(--text-secondary); line-height: 1.6;">To make authentic Indian cooking accessible to everyone through AI-powered recipe matching and step-by-step guidance.</p>
+        </div>
+        <div style="text-align: center; padding: 1.5rem; background: var(--bg-card); border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">👨‍🍳</div>
+          <h4 style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Expert Curation</h4>
+          <p style="color: var(--text-secondary); line-height: 1.6;">Every recipe is carefully curated by culinary experts and home cooks with generations of cooking experience.</p>
+        </div>
+        <div style="text-align: center; padding: 1.5rem; background: var(--bg-card); border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">🌍</div>
+          <h4 style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Global Community</h4>
+          <p style="color: var(--text-secondary); line-height: 1.6;">Join over 50,000 food enthusiasts worldwide who trust CookPro for their daily cooking inspiration.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="auth-modal">
+    <div class="auth-modal-content">
+      <div class="auth-modal-header">
+        <h2 id="authModalTitle">Welcome to CookPro</h2>
+        <button class="auth-modal-close" onclick="closeAuthModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="auth-modal-body">
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form">
+          <div class="auth-form-header">
+            <h3>Sign In</h3>
+            <p>Welcome back! Please sign in to your account.</p>
+          </div>
+          
+          <form id="loginFormElement">
+            <div class="form-group">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full">
+              <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+          </form>
+          
+          <div class="auth-divider">
+            <span>or</span>
+          </div>
+          
+          <button class="btn btn-google" onclick="signInWithGoogle()">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+          
+          <div class="auth-switch">
+            <p>Don't have an account? <a href="#" onclick="showSignupForm()">Sign up</a></p>
+          </div>
+        </div>
+        
+        <!-- Signup Form -->
+        <div id="signupForm" class="auth-form" style="display: none;">
+          <div class="auth-form-header">
+            <h3>Create Account</h3>
+            <p>Join CookPro and discover amazing recipes!</p>
+          </div>
+          
+          <form id="signupFormElement">
+            <div class="form-group">
+              <label for="signupName">Full Name</label>
+              <input type="text" id="signupName" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="signupEmail">Email</label>
+              <input type="email" id="signupEmail" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="signupPassword">Password</label>
+              <input type="password" id="signupPassword" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full">
+              <i class="fas fa-user-plus"></i> Create Account
+            </button>
+          </form>
+          
+          
+          <div class="auth-divider">
+            <span>or</span>
+          </div>
+          
+          <button class="btn btn-google" onclick="signInWithGoogle()">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+          
+          <div class="auth-switch">
+            <p>Already have an account? <a href="#" onclick="showLoginForm()">Sign in</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content" style="display: grid; grid-template-columns: 1fr 2fr; gap: 3rem; margin-bottom: 2rem;">
+        <div class="footer-brand">
+          <div class="footer-logo" style="display: flex; align-items: center; gap: 0.5rem; font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--accent); margin-bottom: 1rem;">
+            <span class="logo-icon">🍛</span>
+            <span class="logo-text">CookPro</span>
+          </div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">Your premium gateway to authentic Indian cuisine. Discover, cook, and share the flavors of India.</p>
+          <div style="display: flex; gap: 1rem;">
+            <a href="#" style="color: var(--text-secondary); font-size: 1.5rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="fab fa-facebook"></i></a>
+            <a href="#" style="color: var(--text-secondary); font-size: 1.5rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="fab fa-twitter"></i></a>
+            <a href="#" style="color: var(--text-secondary); font-size: 1.5rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="fab fa-instagram"></i></a>
+            <a href="#" style="color: var(--text-secondary); font-size: 1.5rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-links" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem;">
+          <div class="footer-section">
+            <h4 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600; font-size: 1.1rem;">Discover</h4>
+            <a href="ingredients.html" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Find Recipes</a>
+            <a href="results.html" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Browse All</a>
+            <a href="saved.html" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">My Recipes</a>
+            <a href="#" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Categories</a>
+          </div>
+          <div class="footer-section">
+            <h4 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600; font-size: 1.1rem;">Community</h4>
+            <a href="reviews.html" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Reviews</a>
+            <a href="#" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Blog</a>
+            <a href="#" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Forums</a>
+            <a href="#" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Events</a>
+          </div>
+          <div class="footer-section">
+            <h4 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600; font-size: 1.1rem;">Support</h4>
+            <a href="contact.html" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Help Center</a>
+            <a href="contact.html" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Contact Us</a>
+            <a href="contact.html" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Privacy Policy</a>
+            <a href="contact.html" style="display: block; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.75rem; transition: var(--transition);" onmouseover="this.style.color='var(--accent)'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateX(0)'">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 2rem; text-align: center; color: var(--text-secondary);">
+        <p>&copy; 2025 CookPro by <strong style="color: var(--accent);">Alok Tiwari</strong>. Made with ❤️ for Indian Food Lovers. All rights reserved.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Preserving India's culinary heritage, one recipe at a time.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- App Scripts -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/firebase-auth.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/api-fix.js"></script>
+  
+
+</body>
+</html>

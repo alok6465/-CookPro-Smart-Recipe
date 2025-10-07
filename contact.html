@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact & FAQ - CookPro</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">🍛</span>
+        <span class="logo-text">CookPro</span>
+      </a>
+      
+      <div class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+        <a href="ingredients.html" class="nav-link">
+          <i class="fas fa-search"></i>
+          <span>Discover</span>
+        </a>
+        <a href="results.html" class="nav-link">
+          <i class="fas fa-utensils"></i>
+          <span>Recipes</span>
+        </a>
+        <a href="saved.html" class="nav-link">
+          <i class="fas fa-bookmark"></i>
+          <span>My List</span>
+        </a>
+        <a href="reviews.html" class="nav-link">
+          <i class="fas fa-star"></i>
+          <span>Reviews</span>
+        </a>
+        <a href="premium.html" class="nav-link">
+          <i class="fas fa-crown"></i>
+          <span>Premium</span>
+        </a>
+        <a href="contact.html" class="nav-link active">
+          <i class="fas fa-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </div>
+      
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main style="padding-top: 80px; min-height: 100vh;">
+    <div class="container">
+      <!-- Contact Form Section -->
+      <section style="max-width: 800px; margin: 0 auto;">
+        <div class="section-header">
+          <h1 class="section-title">
+            <i class="fas fa-headset"></i> Contact & Support
+          </h1>
+          <p class="section-subtitle">Need help? Have a question? We're here to assist you!</p>
+        </div>
+        
+        <div style="background: var(--bg-card); padding: 3rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 3rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+          <form id="contactForm">
+            <div class="form-group">
+              <label for="contactName" class="form-label">
+                <i class="fas fa-user"></i> Full Name *
+              </label>
+              <input type="text" id="contactName" placeholder="Enter your full name" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="contactEmail" class="form-label">
+                <i class="fas fa-envelope"></i> Email Address *
+              </label>
+              <input type="email" id="contactEmail" placeholder="Enter your email address" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="contactPhone" class="form-label">
+                <i class="fas fa-phone"></i> Phone Number
+              </label>
+              <input type="tel" id="contactPhone" placeholder="Enter your phone number (optional)">
+            </div>
+            
+            <div class="form-group">
+              <label for="contactSubject" class="form-label">
+                <i class="fas fa-tag"></i> Subject *
+              </label>
+              <select id="contactSubject" required>
+                <option value="">Select a topic</option>
+                <option value="Technical Issue">Technical Issue</option>
+                <option value="Recipe Problem">Recipe Problem</option>
+                <option value="Account Issue">Account Issue</option>
+                <option value="Premium Support">Premium Support</option>
+                <option value="Feature Request">Feature Request</option>
+                <option value="General Question">General Question</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="contactMessage" class="form-label">
+                <i class="fas fa-comment"></i> Describe Your Problem *
+              </label>
+              <textarea id="contactMessage" placeholder="Please describe your issue or question in detail..." rows="6" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1.2rem;">
+              <i class="fas fa-envelope"></i> Open Email Client to Send Message 
+            </button>
+          </form>
+        </div>
+      </section>
+      
+      <!-- FAQ Section -->
+      <section id="faq">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fas fa-question-circle"></i> Frequently Asked Questions
+          </h2>
+          <p class="section-subtitle">Quick answers to common questions</p>
+        </div>
+        
+        <div style="max-width: 800px; margin: 0 auto;">
+          <div class="faq-item" style="background: var(--bg-card); margin-bottom: 1rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="faq-question" onclick="toggleFAQ(this)" style="padding: 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="color: var(--text-primary); margin: 0;">How do I save recipes?</h3>
+              <i class="fas fa-chevron-down" style="color: var(--accent); transition: transform 0.3s;"></i>
+            </div>
+            <div class="faq-answer" style="padding: 0 1.5rem 1.5rem; display: none;">
+              <p style="color: var(--text-secondary); line-height: 1.6;">Click the bookmark icon on any recipe card or use the "Save" button in the recipe modal. You need to be logged in to save recipes.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item" style="background: var(--bg-card); margin-bottom: 1rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="faq-question" onclick="toggleFAQ(this)" style="padding: 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="color: var(--text-primary); margin: 0;">How does AI recipe matching work?</h3>
+              <i class="fas fa-chevron-down" style="color: var(--accent); transition: transform 0.3s;"></i>
+            </div>
+            <div class="faq-answer" style="padding: 0 1.5rem 1.5rem; display: none;">
+              <p style="color: var(--text-secondary); line-height: 1.6;">Our AI analyzes your ingredients and matches them with recipes in our database using fuzzy search algorithms for the best results.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item" style="background: var(--bg-card); margin-bottom: 1rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="faq-question" onclick="toggleFAQ(this)" style="padding: 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="color: var(--text-primary); margin: 0;">What are Premium features?</h3>
+              <i class="fas fa-chevron-down" style="color: var(--accent); transition: transform 0.3s;"></i>
+            </div>
+            <div class="faq-answer" style="padding: 0 1.5rem 1.5rem; display: none;">
+              <p style="color: var(--text-secondary); line-height: 1.6;">Premium features include PDF downloads, meal planning, nutrition tracking, voice commands, and exclusive recipes from celebrity chefs.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item" style="background: var(--bg-card); margin-bottom: 1rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="faq-question" onclick="toggleFAQ(this)" style="padding: 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="color: var(--text-primary); margin: 0;">How do I reset my password?</h3>
+              <i class="fas fa-chevron-down" style="color: var(--accent); transition: transform 0.3s;"></i>
+            </div>
+            <div class="faq-answer" style="padding: 0 1.5rem 1.5rem; display: none;">
+              <p style="color: var(--text-secondary); line-height: 1.6;">Go to the login page and click "Forgot Password". Enter your email address and we'll send you a reset link.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item" style="background: var(--bg-card); margin-bottom: 1rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="faq-question" onclick="toggleFAQ(this)" style="padding: 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="color: var(--text-primary); margin: 0;">Can I submit my own recipes?</h3>
+              <i class="fas fa-chevron-down" style="color: var(--accent); transition: transform 0.3s;"></i>
+            </div>
+            <div class="faq-answer" style="padding: 0 1.5rem 1.5rem; display: none;">
+              <p style="color: var(--text-secondary); line-height: 1.6;">Yes! Use the contact form above to submit your family recipes. We review all submissions and may feature them on our platform.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🍛</span>
+            <span class="logo-text">CookPro</span>
+          </div>
+          <p>Your gateway to authentic Indian cuisine</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-section">
+            <h4>Support</h4>
+            <a href="contact.html">Contact Us</a>
+            <a href="contact.html">FAQ</a>
+            <a href="#">Help Center</a>
+          </div>
+          <div class="footer-section">
+            <h4>Community</h4>
+            <a href="reviews.html">Reviews</a>
+            <a href="#">Blog</a>
+            <a href="#">Forums</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 CookPro by Alok Tiwari | Made with ❤️ for Indian Food Lovers</p>
+      </div>
+    </div>
+  </footer>
+
+
+  
+  <!-- No external dependencies needed -->
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- App Scripts -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/firebase-auth.js"></script>
+  <script src="assets/js/script.js"></script>
+
+  <script>
+    // FAQ Toggle Function
+    function toggleFAQ(element) {
+      const answer = element.nextElementSibling;
+      const icon = element.querySelector('i');
+      
+      if (answer.style.display === 'none' || answer.style.display === '') {
+        answer.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        answer.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Contact Form Handler - Simple mailto method
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('contactName').value;
+      const email = document.getElementById('contactEmail').value;
+      const phone = document.getElementById('contactPhone').value || 'Not provided';
+      const subject = document.getElementById('contactSubject').value;
+      const message = document.getElementById('contactMessage').value;
+      
+      // Create email content
+      const emailSubject = `CookPro Contact: ${subject}`;
+      const emailBody = `Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0A%0D%0AMessage:%0D%0A${message}`;
+      
+      // Open default email client with pre-filled content
+      const mailtoLink = `mailto:luffyonepiece1p@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${emailBody}`;
+      window.location.href = mailtoLink;
+      
+      // Show success message
+      showMessage('Email client opened! Please send the email from your email app. ✅', 'success');
+      
+      // Reset form after 2 seconds
+      setTimeout(() => {
+        document.getElementById('contactForm').reset();
+      }, 2000);
+    });
+    
+    // Message display function
+    function showMessage(message, type) {
+      const existing = document.querySelector('.alert-message');
+      if (existing) existing.remove();
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'alert-message';
+      const bgColor = type === 'success' ? '#10b981' : '#ef4444';
+      messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        font-weight: 500;
+        max-width: 300px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      `;
+      messageDiv.textContent = message;
+      
+      document.body.appendChild(messageDiv);
+      
+      setTimeout(() => {
+        messageDiv.style.transform = 'translateX(0)';
+      }, 100);
+      
+      setTimeout(() => {
+        messageDiv.style.transform = 'translateX(100%)';
+        setTimeout(() => messageDiv.remove(), 300);
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
