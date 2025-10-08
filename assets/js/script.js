@@ -956,37 +956,80 @@ function saveRecipe(recipe, button) {
   }
 }
 
-// Load recipe comments
+// Load recipe comments from Firebase
 function loadRecipeComments(recipeId) {
   const container = document.getElementById('commentsContainer');
   if (!container) return;
   
-  if (typeof FirebaseDB !== 'undefined') {
-    FirebaseDB.getRecipeComments(recipeId).then(comments => {
-      if (comments.length === 0) {
-        container.innerHTML = '<div class="no-comments">No comments yet. Be the first to comment!</div>';
-        return;
-      }
-      
-      container.innerHTML = comments.map(comment => `
-        <div class="comment">
-          <div class="comment-header">
-            <strong>${comment.userName || 'Anonymous'}</strong>
-            <span class="comment-date">${formatDate(comment.createdAt)}</span>
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading comments...</div>';
+  
+  // Check if Firebase is available
+  if (typeof db !== 'undefined' && db) {
+    db.collection('recipeComments')
+      .where('recipeId', '==', recipeId)
+      .orderBy('createdAt', 'desc')
+      .get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = '<div class="no-comments">No comments yet. Be the first to comment!</div>';
+          return;
+        }
+        
+        const comments = [];
+        snapshot.forEach(doc => {
+          comments.push({ id: doc.id, ...doc.data() });
+        });
+        
+        container.innerHTML = comments.map(comment => `
+          <div class="comment" data-comment-id="${comment.id}">
+            <div class="comment-header">
+              <strong>${comment.userName || 'Anonymous'}</strong>
+              <span class="comment-date">${formatDate(comment.createdAt)}</span>
+            </div>
+            <div class="comment-text">${comment.comment}</div>
           </div>
-          <div class="comment-text">${comment.comment}</div>
-        </div>
-      `).join('');
-    });
+        `).join('');
+      })
+      .catch(error => {
+        console.error('Error loading comments:', error);
+        container.innerHTML = '<div class="no-comments">Error loading comments. Please try again.</div>';
+      });
   } else {
-    container.innerHTML = '<div class="no-comments">Comments feature requires login</div>';
+    // Fallback: try using FirebaseDB if available
+    if (typeof FirebaseDB !== 'undefined') {
+      FirebaseDB.getRecipeComments(recipeId)
+        .then(comments => {
+          if (comments.length === 0) {
+            container.innerHTML = '<div class="no-comments">No comments yet. Be the first to comment!</div>';
+            return;
+          }
+          
+          container.innerHTML = comments.map(comment => `
+            <div class="comment">
+              <div class="comment-header">
+                <strong>${comment.userName || 'Anonymous'}</strong>
+                <span class="comment-date">${formatDate(comment.createdAt)}</span>
+              </div>
+              <div class="comment-text">${comment.comment}</div>
+            </div>
+          `).join('');
+        })
+        .catch(error => {
+          console.error('FirebaseDB error:', error);
+          container.innerHTML = '<div class="no-comments">Comments unavailable. Please sign in to view comments.</div>';
+        });
+    } else {
+      container.innerHTML = '<div class="no-comments">Firebase not initialized. Please refresh the page.</div>';
+    }
   }
 }
 
-// Add comment
+// Add comment to Firebase
 function addComment() {
-  if (typeof AuthManager === 'undefined' || !AuthManager.isUserLoggedIn()) {
+  // Check authentication
+  if (typeof auth === 'undefined' || !auth.currentUser) {
     showMessage('Please login to comment!', 'info');
+    openAuthModal();
     return;
   }
   
@@ -996,21 +1039,59 @@ function addComment() {
     return;
   }
   
-  const userId = AuthManager.getCurrentUserId();
-  const user = AuthManager.getCurrentUser();
+  const user = auth.currentUser;
   const recipeId = currentRecipe?.name || 'unknown';
+  const comment = commentText.value.trim();
   
-  if (typeof FirebaseDB !== 'undefined') {
-    FirebaseDB.addRecipeComment(recipeId, userId, user.displayName || 'Anonymous', commentText.value.trim())
-      .then(success => {
-        if (success) {
-          commentText.value = '';
-          showMessage('Comment added!', 'success');
-          loadRecipeComments(recipeId);
-        } else {
-          showMessage('Error adding comment', 'error');
-        }
-      });
+  // Show loading state
+  const submitBtn = document.querySelector('.comment-form button');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+  submitBtn.disabled = true;
+  
+  // Add to Firebase directly
+  if (typeof db !== 'undefined' && db) {
+    db.collection('recipeComments').add({
+      recipeId: recipeId,
+      userId: user.uid,
+      userName: user.displayName || user.email || 'Anonymous',
+      comment: comment,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+      commentText.value = '';
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+      showMessage('Comment added successfully!', 'success');
+      loadRecipeComments(recipeId);
+    })
+    .catch(error => {
+      console.error('Error adding comment:', error);
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+      showMessage('Error adding comment. Please try again.', 'error');
+    });
+  } else {
+    // Fallback to FirebaseDB
+    if (typeof FirebaseDB !== 'undefined') {
+      FirebaseDB.addRecipeComment(recipeId, user.uid, user.displayName || 'Anonymous', comment)
+        .then(success => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+          
+          if (success) {
+            commentText.value = '';
+            showMessage('Comment added!', 'success');
+            loadRecipeComments(recipeId);
+          } else {
+            showMessage('Error adding comment', 'error');
+          }
+        });
+    } else {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+      showMessage('Firebase not available', 'error');
+    }
   }
 }
 
@@ -1126,37 +1207,80 @@ function viewTodaysRecipe(meal) {
   }
 }
 
-// Load recent comments with animation
+// Load recent comments from Firebase
 function loadRecentComments() {
   const container = document.getElementById('recentCommentsList');
   if (!container) return;
   
-  // Show loading state
-  container.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="color: var(--accent); font-size: 2rem;"></i><p style="color: var(--text-secondary); margin-top: 1rem;">Loading comments...</p></div>';
+  container.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="color: var(--accent); font-size: 2rem;"></i><p style="color: var(--text-secondary); margin-top: 1rem;">Loading recent comments...</p></div>';
   
-  // Simulate loading delay
-  setTimeout(() => {
-    const sampleComments = [
-      { userName: 'Priya S.', comment: 'Amazing Butter Chicken recipe! My family loved it.', rating: 5, recipeName: 'Butter Chicken', time: '2h ago' },
-      { userName: 'Raj K.', comment: 'Perfect Dal Tadka. Just like my mom makes!', rating: 5, recipeName: 'Dal Tadka', time: '4h ago' },
-      { userName: 'Meera P.', comment: 'The Biryani turned out fantastic. Great instructions!', rating: 4, recipeName: 'Vegetable Biryani', time: '6h ago' },
-      { userName: 'Amit T.', comment: 'Loved the Chole Masala! Authentic taste.', rating: 5, recipeName: 'Chole Masala', time: '5h ago' },
-      { userName: 'Sneha M.', comment: 'Paneer Tikka was delicious and easy to make.', rating: 4, recipeName: 'Paneer Tikka', time: '8h ago' }
-    ];
-    
-    container.innerHTML = sampleComments.map((comment, index) => `
-      <div class="comment-card" style="min-width: 300px; background: var(--bg-card); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1); animation: fadeInUp 0.5s ease-out ${index * 0.1}s both;">
-        <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <strong style="color: var(--text-primary);">${comment.userName}</strong>
-          <span style="color: var(--text-secondary); font-size: 0.9rem;">${comment.time}</span>
-        </div>
-        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">${comment.comment}</p>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <span style="color: var(--accent);">⭐ ${comment.rating}/5</span>
-          <span style="color: var(--text-secondary); font-size: 0.9rem;">${comment.recipeName}</span>
-        </div>
+  // Try to load from Firebase
+  if (typeof db !== 'undefined' && db) {
+    db.collection('recipeComments')
+      .orderBy('createdAt', 'desc')
+      .limit(5)
+      .get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          loadFallbackComments(container);
+          return;
+        }
+        
+        const comments = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          comments.push({
+            userName: data.userName || 'Anonymous',
+            comment: data.comment,
+            recipeName: data.recipeId || 'Recipe',
+            createdAt: data.createdAt
+          });
+        });
+        
+        container.innerHTML = comments.map((comment, index) => `
+          <div class="comment-card" style="min-width: 300px; background: var(--bg-card); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1); animation: fadeInUp 0.5s ease-out ${index * 0.1}s both;">
+            <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <strong style="color: var(--text-primary);">${comment.userName}</strong>
+              <span style="color: var(--text-secondary); font-size: 0.9rem;">${formatDate(comment.createdAt)}</span>
+            </div>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">${comment.comment}</p>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span style="color: var(--accent);">⭐ 5/5</span>
+              <span style="color: var(--text-secondary); font-size: 0.9rem;">${comment.recipeName}</span>
+            </div>
+          </div>
+        `).join('');
+      })
+      .catch(error => {
+        console.error('Error loading recent comments:', error);
+        loadFallbackComments(container);
+      });
+  } else {
+    // Fallback if Firebase not available
+    setTimeout(() => loadFallbackComments(container), 1000);
+  }
+}
+
+// Fallback comments when Firebase is unavailable
+function loadFallbackComments(container) {
+  const sampleComments = [
+    { userName: 'Priya S.', comment: 'Amazing Butter Chicken recipe! My family loved it.', recipeName: 'Butter Chicken', time: '2h ago' },
+    { userName: 'Raj K.', comment: 'Perfect Dal Tadka. Just like my mom makes!', recipeName: 'Dal Tadka', time: '4h ago' },
+    { userName: 'Meera P.', comment: 'The Biryani turned out fantastic. Great instructions!', recipeName: 'Vegetable Biryani', time: '6h ago' }
+  ];
+  
+  container.innerHTML = sampleComments.map((comment, index) => `
+    <div class="comment-card" style="min-width: 300px; background: var(--bg-card); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1); animation: fadeInUp 0.5s ease-out ${index * 0.1}s both;">
+      <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <strong style="color: var(--text-primary);">${comment.userName}</strong>
+        <span style="color: var(--text-secondary); font-size: 0.9rem;">${comment.time}</span>
       </div>
-    `).join('');
-  }, 1000);
+      <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">${comment.comment}</p>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <span style="color: var(--accent);">⭐ 5/5</span>
+        <span style="color: var(--text-secondary); font-size: 0.9rem;">${comment.recipeName}</span>
+      </div>
+    </div>
+  `).join('');
 }
 
