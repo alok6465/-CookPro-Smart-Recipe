@@ -355,21 +355,47 @@ async function loadUserLikedRecipes(userId) {
   }
 }
 
+// Security helper
+function sanitizeText(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function createLikedRecipeCard(recipe) {
   const card = document.createElement('div');
   card.className = 'liked-recipe-card';
   
-  const recipeIndex = window.recipes ? window.recipes.findIndex(r => r.name === recipe.name) : -1;
+  const imageDiv = document.createElement('div');
+  imageDiv.className = 'liked-recipe-image';
   
-  card.innerHTML = `
-    <div class="liked-recipe-image">
-      ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}" style="width: 100%; height: 100%; object-fit: cover;">` : '🍛'}
-    </div>
-    <div class="liked-recipe-content">
-      <div class="liked-recipe-title">${recipe.name}</div>
-      <div class="liked-recipe-time">⏱️ ${recipe.time || '30 mins'}</div>
-    </div>
-  `;
+  if (recipe.image) {
+    const img = document.createElement('img');
+    img.src = recipe.image;
+    img.alt = sanitizeText(recipe.name || 'Recipe');
+    img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+    imageDiv.appendChild(img);
+  } else {
+    imageDiv.textContent = '🍛';
+  }
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'liked-recipe-content';
+  
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'liked-recipe-title';
+  titleDiv.textContent = recipe.name || 'Unknown Recipe';
+  
+  const timeDiv = document.createElement('div');
+  timeDiv.className = 'liked-recipe-time';
+  timeDiv.textContent = `⏱️ ${recipe.time || '30 mins'}`;
+  
+  contentDiv.appendChild(titleDiv);
+  contentDiv.appendChild(timeDiv);
+  card.appendChild(imageDiv);
+  card.appendChild(contentDiv);
+  
+  const recipeIndex = window.recipes ? window.recipes.findIndex(r => r.name === recipe.name) : -1;
   
   card.addEventListener('click', () => {
     closeProfileModal();
@@ -459,18 +485,33 @@ function createUserCommentItem(comment) {
   const item = document.createElement('div');
   item.className = 'user-comment-item';
   
-  const timeAgo = comment.createdAt ? formatTimeAgo(comment.createdAt.toDate()) : 'Just now';
+  const recipeNameDiv = document.createElement('div');
+  recipeNameDiv.className = 'comment-recipe-name';
+  recipeNameDiv.textContent = comment.recipeName || 'Unknown Recipe';
   
-  item.innerHTML = `
-    <div class="comment-recipe-name">${comment.recipeName}</div>
-    <div class="comment-text">${comment.comment}</div>
-    <div class="comment-meta">
-      <span class="comment-time">${timeAgo}</span>
-      <button class="comment-delete" onclick="deleteUserComment('${comment.id}')">
-        <i class="fas fa-trash"></i> Delete
-      </button>
-    </div>
-  `;
+  const commentTextDiv = document.createElement('div');
+  commentTextDiv.className = 'comment-text';
+  commentTextDiv.textContent = comment.comment || '';
+  
+  const metaDiv = document.createElement('div');
+  metaDiv.className = 'comment-meta';
+  
+  const timeSpan = document.createElement('span');
+  timeSpan.className = 'comment-time';
+  const timeAgo = comment.createdAt ? formatTimeAgo(comment.createdAt.toDate()) : 'Just now';
+  timeSpan.textContent = timeAgo;
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'comment-delete';
+  deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+  deleteBtn.addEventListener('click', () => deleteUserComment(comment.id));
+  
+  metaDiv.appendChild(timeSpan);
+  metaDiv.appendChild(deleteBtn);
+  
+  item.appendChild(recipeNameDiv);
+  item.appendChild(commentTextDiv);
+  item.appendChild(metaDiv);
   
   return item;
 }
@@ -605,6 +646,67 @@ function switchTab(tab) {
 }
 
 function openAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    showLoginForm();
+  }
+}
+
+function closeAuthModal() {
+  AuthManager.closeAuthModal();
+}
+
+function showLoginForm() {
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  if (loginForm && signupForm) {
+    loginForm.style.display = 'block';
+    signupForm.style.display = 'none';
+  }
+}
+
+function showSignupForm() {
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  if (loginForm && signupForm) {
+    loginForm.style.display = 'none';
+    signupForm.style.display = 'block';
+  }
+}
+
+function signInWithGoogle() {
+  AuthManager.signInWithGoogle();
+}
+
+function logout() {
+  AuthManager.signOut();
+}
+
+function toggleUserDropdown() {
+  const dropdown = document.getElementById('userDropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('active');
+  }
+}
+
+function viewProfile() {
+  toggleUserDropdown();
+  openProfileModal();
+}
+
+function viewSettings() {
+  AuthManager.showMessage('Settings feature coming soon!', 'success');
+  toggleUserDropdown();
+}
+
+// Initialize auth when DOM loads
+function initializeAuth() {
+  if (typeof AuthManager !== 'undefined') {
+    AuthManager.init();
+  }
+}dal() {
   const modal = document.getElementById('authModal');
   if (modal) {
     modal.classList.add('active');
