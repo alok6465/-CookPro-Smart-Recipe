@@ -59,8 +59,6 @@ function parseSearchIngredients(input) {
   return ingredients;
 }
 
-
-
 // Enhanced filtering function
 function filterRecipesByIngredients(recipes, ingredientsInput) {
   if (!ingredientsInput?.trim()) return recipes;

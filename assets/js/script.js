@@ -254,12 +254,11 @@ function initializeReviewsPage() {
     loadCommunityReviews();
   }, 1000);
   
-  // Add review form handler if exists
   const reviewForm = document.getElementById('reviewForm');
   if (reviewForm) {
     reviewForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      submitReview();
+      showMessage('Review submission coming soon!', 'info');
     });
   }
 }

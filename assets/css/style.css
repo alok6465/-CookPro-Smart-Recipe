@@ -1596,19 +1596,6 @@ input[type="file"]:hover {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
   
-  .nav-menu.active {
-    left: 0;
-  }
-  
-  .nav-link {
-    width: 100%;
-    padding: 1rem;
-    justify-content: flex-start;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    border-radius: var(--border-radius);
-  }
-  
   .hamburger {
     display: flex;
   }
