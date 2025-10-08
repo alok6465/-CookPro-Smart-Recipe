@@ -266,7 +266,10 @@ function initializeReviewsPage() {
 // Enhanced AI search with validation
 function searchAI() {
   const input = document.getElementById('quickSearchInput');
-  if (!input) return;
+  if (!input) {
+    showMessage('Search input not found!', 'error');
+    return;
+  }
   
   const ingredients = input.value.trim();
   if (!ingredients) {
@@ -279,6 +282,9 @@ function searchAI() {
     showMessage('Please enter at least 2 characters', 'error');
     return;
   }
+  
+  // Show loading message
+  showMessage('Searching for recipes...', 'info');
   
   localStorage.setItem('userIngredients', ingredients);
   localStorage.setItem('searchMode', 'online');
@@ -380,7 +386,35 @@ function toggleUserDropdown() {
 
 function viewProfile() {
   toggleUserDropdown();
-  showMessage('Profile feature coming soon!', 'info');
+  
+  // Create and show profile modal
+  const modal = document.createElement('div');
+  modal.className = 'recipe-modal';
+  modal.innerHTML = `
+    <div class="recipe-modal-content">
+      <div class="recipe-modal-header">
+        <h2><i class="fas fa-user"></i> User Profile</h2>
+        <button class="recipe-modal-close" onclick="this.closest('.recipe-modal').remove(); document.body.style.overflow='auto';">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="recipe-modal-body">
+        <div style="text-align: center; padding: 2rem;">
+          <div style="width: 100px; height: 100px; background: var(--gradient-primary); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">
+            <i class="fas fa-user"></i>
+          </div>
+          <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Welcome to CookPro!</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 2rem;">Sign in to access your saved recipes, comments, and personalized features.</p>
+          <button onclick="openAuthModal(); this.closest('.recipe-modal').remove(); document.body.style.overflow='auto';" class="btn btn-primary">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
 }
 
 function viewSettings() {
@@ -431,15 +465,61 @@ function renderOfflineResults(ingredients) {
   updateResultsHeader(filteredRecipes.length, ingredients);
 }
 
-// Render online results (placeholder)
+// Render online results with AI simulation
 function renderOnlineResults(ingredients) {
   const container = document.getElementById('recipesContainer');
   if (!container) return;
   
-  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Searching online recipes...</div>';
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> AI is finding perfect recipes...</div>';
   
   setTimeout(() => {
-    container.innerHTML = '<div class="no-results">Online search coming soon! Try offline search for now.</div>';
+    // Simulate AI search by filtering existing recipes with better matching
+    const searchTerms = ingredients.toLowerCase().split(',').map(term => term.trim());
+    const aiFilteredRecipes = recipes.filter(recipe => {
+      const recipeIngredients = (recipe.ingredients || []).join(' ').toLowerCase();
+      const recipeName = (recipe.name || '').toLowerCase();
+      
+      // AI-like scoring system
+      let score = 0;
+      searchTerms.forEach(term => {
+        if (recipeIngredients.includes(term)) score += 2;
+        if (recipeName.includes(term)) score += 1;
+      });
+      
+      return score > 0;
+    }).sort((a, b) => {
+      // Sort by relevance (more matching ingredients first)
+      const aScore = searchTerms.reduce((score, term) => {
+        const aIngredients = (a.ingredients || []).join(' ').toLowerCase();
+        return score + (aIngredients.includes(term) ? 1 : 0);
+      }, 0);
+      
+      const bScore = searchTerms.reduce((score, term) => {
+        const bIngredients = (b.ingredients || []).join(' ').toLowerCase();
+        return score + (bIngredients.includes(term) ? 1 : 0);
+      }, 0);
+      
+      return bScore - aScore;
+    });
+    
+    if (aiFilteredRecipes.length === 0) {
+      container.innerHTML = '<div class="no-results">No AI recipes found. Try different ingredients!</div>';
+      return;
+    }
+    
+    container.innerHTML = '';
+    aiFilteredRecipes.slice(0, 8).forEach((recipe, index) => {
+      const card = createRecipeCard(recipe, index, 'ai');
+      // Add AI badge
+      const aiBadge = document.createElement('div');
+      aiBadge.innerHTML = '<span style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; position: absolute; top: 1rem; right: 1rem;"><i class="fas fa-robot"></i> AI Match</span>';
+      card.style.position = 'relative';
+      card.appendChild(aiBadge);
+      container.appendChild(card);
+    });
+    
+    updateResultsHeader(aiFilteredRecipes.length, ingredients);
+    showMessage(`AI found ${aiFilteredRecipes.length} perfect matches!`, 'success');
   }, 2000);
 }
 
@@ -839,43 +919,47 @@ function loadTodaysMenu() {
   });
 }
 
-// Load recent comments
+// Fix Today's Menu click handlers
+function refreshTodaysMenu() {
+  showMessage('Menu refreshed!', 'success');
+  loadTodaysMenu();
+}
+
+function viewTodaysRecipe(meal) {
+  const mealRecipes = {
+    breakfast: { name: 'Masala Dosa', ingredients: ['rice', 'urad dal', 'potato', 'onion', 'spices'] },
+    lunch: { name: 'Rajma Chawal', ingredients: ['rajma', 'rice', 'onion', 'tomato', 'spices'] },
+    dinner: { name: 'Paneer Butter Masala', ingredients: ['paneer', 'butter', 'tomato', 'cream', 'spices'] }
+  };
+  
+  const recipe = mealRecipes[meal];
+  if (recipe) {
+    localStorage.setItem('userIngredients', recipe.ingredients.join(', '));
+    localStorage.setItem('searchMode', 'offline');
+    window.location.href = 'results.html';
+  }
+}
+
+// Load recent comments with animation
 function loadRecentComments() {
   const container = document.getElementById('recentCommentsList');
   if (!container) return;
   
-  if (typeof FirebaseDB !== 'undefined') {
-    // Load from Firebase
-    FirebaseDB.getReviews().then(reviews => {
-      if (reviews.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No recent comments</div>';
-        return;
-      }
-      
-      container.innerHTML = reviews.slice(0, 5).map(review => `
-        <div class="comment-card" style="min-width: 300px; background: var(--bg-card); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
-          <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <strong style="color: var(--text-primary);">${review.userName || 'Anonymous'}</strong>
-            <span style="color: var(--text-secondary); font-size: 0.9rem;">${formatDate(review.createdAt)}</span>
-          </div>
-          <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">${review.comment || review.review}</p>
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <span style="color: var(--accent);">⭐ ${review.rating || 5}/5</span>
-            <span style="color: var(--text-secondary); font-size: 0.9rem;">${review.recipeName || 'Recipe'}</span>
-          </div>
-        </div>
-      `).join('');
-    });
-  } else {
-    // Fallback with sample comments
+  // Show loading state
+  container.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="color: var(--accent); font-size: 2rem;"></i><p style="color: var(--text-secondary); margin-top: 1rem;">Loading comments...</p></div>';
+  
+  // Simulate loading delay
+  setTimeout(() => {
     const sampleComments = [
       { userName: 'Priya S.', comment: 'Amazing Butter Chicken recipe! My family loved it.', rating: 5, recipeName: 'Butter Chicken', time: '2h ago' },
       { userName: 'Raj K.', comment: 'Perfect Dal Tadka. Just like my mom makes!', rating: 5, recipeName: 'Dal Tadka', time: '4h ago' },
-      { userName: 'Meera P.', comment: 'The Biryani turned out fantastic. Great instructions!', rating: 4, recipeName: 'Vegetable Biryani', time: '6h ago' }
+      { userName: 'Meera P.', comment: 'The Biryani turned out fantastic. Great instructions!', rating: 4, recipeName: 'Vegetable Biryani', time: '6h ago' },
+      { userName: 'Amit T.', comment: 'Loved the Chole Masala! Authentic taste.', rating: 5, recipeName: 'Chole Masala', time: '5h ago' },
+      { userName: 'Sneha M.', comment: 'Paneer Tikka was delicious and easy to make.', rating: 4, recipeName: 'Paneer Tikka', time: '8h ago' }
     ];
     
-    container.innerHTML = sampleComments.map(comment => `
-      <div class="comment-card" style="min-width: 300px; background: var(--bg-card); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+    container.innerHTML = sampleComments.map((comment, index) => `
+      <div class="comment-card" style="min-width: 300px; background: var(--bg-card); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1); animation: fadeInUp 0.5s ease-out ${index * 0.1}s both;">
         <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <strong style="color: var(--text-primary);">${comment.userName}</strong>
           <span style="color: var(--text-secondary); font-size: 0.9rem;">${comment.time}</span>
@@ -887,6 +971,6 @@ function loadRecentComments() {
         </div>
       </div>
     `).join('');
-  }
+  }, 1000);
 }
 
