@@ -1,88 +1,49 @@
-// Enhanced API Configuration
-const API_CONFIG = {
-  BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:4000'
-    : 'https://ind-recipes-api.onrender.com',
-  TIMEOUT: 10000,
-  RETRY_ATTEMPTS: 3
-};
+// API functionality for online recipe search
+function getApiUrl(ingredients) {
+  // Using Spoonacular API as fallback
+  const apiKey = 'demo'; // Replace with actual API key
+  return `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${encodeURIComponent(ingredients)}&number=12&apiKey=${apiKey}`;
+}
 
-// Enhanced fetch with retry and timeout
-async function fetchWithRetry(url, options = {}, retries = API_CONFIG.RETRY_ATTEMPTS) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
-  
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+// Enhanced fetch with retry mechanism
+async function fetchWithRetry(url, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        return await response.json();
+      }
+      throw new Error(`HTTP ${response.status}`);
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
     }
-    
-    return await response.json();
-  } catch (error) {
-    clearTimeout(timeoutId);
-    
-    if (retries > 0 && !controller.signal.aborted) {
-      console.warn(`API request failed, retrying... (${retries} attempts left)`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return fetchWithRetry(url, options, retries - 1);
-    }
-    
-    throw error;
   }
 }
 
-function getApiUrl(query) {
-  return `${API_CONFIG.BASE_URL}/?q=${encodeURIComponent(query)}`;
+// Parse search ingredients
+function parseSearchIngredients(ingredients) {
+  return ingredients.split(',').map(ingredient => ingredient.trim()).filter(Boolean);
 }
 
-// Enhanced search logic - handles spaces, commas, special characters
-function parseSearchIngredients(input) {
-  if (!input || typeof input !== 'string') return [];
-  
-  // Remove special characters except letters, numbers, spaces, commas
-  const cleaned = input.replace(/[^\w\s,.-]/g, '');
-  
-  // Split by comma, space, or multiple spaces and filter empty strings
-  const ingredients = cleaned
-    .split(/[,\s]+/)
-    .map(ingredient => ingredient.trim().toLowerCase())
-    .filter(ingredient => ingredient.length > 0);
-  
-  console.log('🔍 Parsed ingredients:', ingredients);
-  return ingredients;
-}
-
-// Enhanced filtering function
-function filterRecipesByIngredients(recipes, ingredientsInput) {
-  if (!ingredientsInput?.trim()) return recipes;
-  
-  const searchIngredients = parseSearchIngredients(ingredientsInput);
-  if (searchIngredients.length === 0) return recipes;
+// Filter recipes by ingredients
+function filterRecipesByIngredients(recipes, ingredients) {
+  const searchTerms = ingredients.toLowerCase().split(',').map(term => term.trim());
   
   return recipes.filter(recipe => {
-    const recipeIngredients = recipe.ingredients?.map(ing => ing.toLowerCase()) || [];
-    const searchableText = [
-      recipe.name || '',
-      recipe.description || '',
-      ...(recipe.benefits || [])
-    ].join(' ').toLowerCase();
+    const recipeIngredients = (recipe.ingredients || []).join(' ').toLowerCase();
+    const recipeName = (recipe.name || '').toLowerCase();
+    const recipeDesc = (recipe.description || '').toLowerCase();
     
-    return searchIngredients.some(searchIng => 
-      recipeIngredients.some(recipeIng => 
-        recipeIng.includes(searchIng) || searchIng.includes(recipeIng)
-      ) || searchableText.includes(searchIng)
+    return searchTerms.some(term => 
+      recipeIngredients.includes(term) || 
+      recipeName.includes(term) || 
+      recipeDesc.includes(term)
     );
   });
 }
 
-// Debounce helper for performance
+// Debounce function for search optimization
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {

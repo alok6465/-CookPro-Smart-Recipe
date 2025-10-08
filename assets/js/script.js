@@ -300,12 +300,92 @@ function searchAI() {
 function renderResults() {
   const searchMode = localStorage.getItem('searchMode') || 'offline';
   const ingredients = localStorage.getItem('userIngredients') || '';
+  const container = document.getElementById('recipesContainer') || document.getElementById('recipeResults');
+  
+  if (!container) {
+    console.error('Recipe container not found');
+    return;
+  }
   
   if (searchMode === 'offline') {
     renderOfflineResults(ingredients);
   } else {
     renderOnlineResults(ingredients);
   }
+}
+
+// Initialize auth system
+function initializeAuth() {
+  if (typeof AuthManager !== 'undefined') {
+    AuthManager.init();
+  }
+}
+
+// Auth modal functions
+function openAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    showLoginForm();
+  }
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+}
+
+function showLoginForm() {
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  if (loginForm && signupForm) {
+    loginForm.style.display = 'block';
+    signupForm.style.display = 'none';
+  }
+}
+
+function showSignupForm() {
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  if (loginForm && signupForm) {
+    loginForm.style.display = 'none';
+    signupForm.style.display = 'block';
+  }
+}
+
+function signInWithGoogle() {
+  if (typeof AuthManager !== 'undefined') {
+    AuthManager.signInWithGoogle();
+  } else {
+    showMessage('Authentication system loading...', 'info');
+  }
+}
+
+function logout() {
+  if (typeof AuthManager !== 'undefined') {
+    AuthManager.signOut();
+  }
+}
+
+function toggleUserDropdown() {
+  const dropdown = document.getElementById('userDropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('active');
+  }
+}
+
+function viewProfile() {
+  toggleUserDropdown();
+  showMessage('Profile feature coming soon!', 'info');
+}
+
+function viewSettings() {
+  toggleUserDropdown();
+  showMessage('Settings feature coming soon!', 'info');
 }
 
 // Render offline results
