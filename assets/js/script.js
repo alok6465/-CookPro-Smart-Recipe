@@ -427,100 +427,228 @@ function renderOfflineResults(ingredients) {
   const container = document.getElementById('recipesContainer');
   if (!container) return;
   
-  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading recipes...</div>';
-  
-  if (recipes.length === 0) {
-    container.innerHTML = '<div class="no-results">No recipes found. Please try different ingredients.</div>';
-    return;
-  }
-  
-  let filteredRecipes = recipes;
-  
-  if (ingredients.trim()) {
-    const searchTerms = ingredients.toLowerCase().split(',').map(term => term.trim());
-    filteredRecipes = recipes.filter(recipe => {
-      const recipeIngredients = (recipe.ingredients || []).join(' ').toLowerCase();
-      const recipeName = (recipe.name || '').toLowerCase();
-      const recipeDesc = (recipe.description || '').toLowerCase();
-      
-      return searchTerms.some(term => 
-        recipeIngredients.includes(term) || 
-        recipeName.includes(term) || 
-        recipeDesc.includes(term)
-      );
-    });
-  }
-  
-  if (filteredRecipes.length === 0) {
-    container.innerHTML = '<div class="no-results">No recipes found with those ingredients. Try different ones!</div>';
-    return;
-  }
-  
-  container.innerHTML = '';
-  filteredRecipes.forEach((recipe, index) => {
-    const card = createRecipeCard(recipe, index, 'offline');
-    container.appendChild(card);
-  });
-  
-  updateResultsHeader(filteredRecipes.length, ingredients);
-}
-
-// Render online results with AI simulation
-function renderOnlineResults(ingredients) {
-  const container = document.getElementById('recipesContainer');
-  if (!container) return;
-  
-  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> AI is finding perfect recipes...</div>';
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading local recipes...</div>';
   
   setTimeout(() => {
-    // Simulate AI search by filtering existing recipes with better matching
-    const searchTerms = ingredients.toLowerCase().split(',').map(term => term.trim());
-    const aiFilteredRecipes = recipes.filter(recipe => {
-      const recipeIngredients = (recipe.ingredients || []).join(' ').toLowerCase();
-      const recipeName = (recipe.name || '').toLowerCase();
-      
-      // AI-like scoring system
-      let score = 0;
-      searchTerms.forEach(term => {
-        if (recipeIngredients.includes(term)) score += 2;
-        if (recipeName.includes(term)) score += 1;
-      });
-      
-      return score > 0;
-    }).sort((a, b) => {
-      // Sort by relevance (more matching ingredients first)
-      const aScore = searchTerms.reduce((score, term) => {
-        const aIngredients = (a.ingredients || []).join(' ').toLowerCase();
-        return score + (aIngredients.includes(term) ? 1 : 0);
-      }, 0);
-      
-      const bScore = searchTerms.reduce((score, term) => {
-        const bIngredients = (b.ingredients || []).join(' ').toLowerCase();
-        return score + (bIngredients.includes(term) ? 1 : 0);
-      }, 0);
-      
-      return bScore - aScore;
-    });
+    if (recipes.length === 0) {
+      container.innerHTML = '<div class="no-results">No recipes found. Please try different ingredients.</div>';
+      return;
+    }
     
-    if (aiFilteredRecipes.length === 0) {
-      container.innerHTML = '<div class="no-results">No AI recipes found. Try different ingredients!</div>';
+    let filteredRecipes = recipes;
+    
+    if (ingredients.trim()) {
+      const searchTerms = ingredients.toLowerCase().split(',').map(term => term.trim());
+      filteredRecipes = recipes.filter(recipe => {
+        const recipeIngredients = (recipe.ingredients || []).join(' ').toLowerCase();
+        const recipeName = (recipe.name || '').toLowerCase();
+        const recipeDesc = (recipe.description || '').toLowerCase();
+        
+        return searchTerms.some(term => 
+          recipeIngredients.includes(term) || 
+          recipeName.includes(term) || 
+          recipeDesc.includes(term)
+        );
+      });
+    }
+    
+    if (filteredRecipes.length === 0) {
+      container.innerHTML = '<div class="no-results">No recipes found with those ingredients. Try different ones!</div>';
       return;
     }
     
     container.innerHTML = '';
-    aiFilteredRecipes.slice(0, 8).forEach((recipe, index) => {
-      const card = createRecipeCard(recipe, index, 'ai');
-      // Add AI badge
-      const aiBadge = document.createElement('div');
-      aiBadge.innerHTML = '<span style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; position: absolute; top: 1rem; right: 1rem;"><i class="fas fa-robot"></i> AI Match</span>';
-      card.style.position = 'relative';
-      card.appendChild(aiBadge);
+    filteredRecipes.forEach((recipe, index) => {
+      const card = createRecipeCard(recipe, index, 'offline');
       container.appendChild(card);
     });
     
-    updateResultsHeader(aiFilteredRecipes.length, ingredients);
-    showMessage(`AI found ${aiFilteredRecipes.length} perfect matches!`, 'success');
-  }, 2000);
+    updateResultsHeader(filteredRecipes.length, ingredients);
+  }, 500);
+}
+
+// Render online results with real API
+async function renderOnlineResults(ingredients) {
+  const container = document.getElementById('recipesContainer');
+  if (!container) return;
+  
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> AI is searching thousands of recipes...</div>';
+  
+  try {
+    // Use free recipe API
+    const cleanIngredients = ingredients.replace(/[^a-zA-Z,\s]/g, '').trim();
+    const apiUrl = `https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(cleanIngredients.split(',')[0].trim())}`;
+    
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    
+    if (!data.meals || data.meals.length === 0) {
+      // Fallback to Edamam API
+      const edamamUrl = `https://api.edamam.com/search?q=${encodeURIComponent(ingredients)}&app_id=demo&app_key=demo&from=0&to=12`;
+      
+      try {
+        const edamamResponse = await fetch(edamamUrl);
+        const edamamData = await edamamResponse.json();
+        
+        if (edamamData.hits && edamamData.hits.length > 0) {
+          renderEdamamRecipes(edamamData.hits, container, ingredients);
+          return;
+        }
+      } catch (error) {
+        console.log('Edamam API failed, using fallback');
+      }
+      
+      // Final fallback to local enhanced search
+      renderEnhancedLocalSearch(ingredients, container);
+      return;
+    }
+    
+    // Process TheMealDB results
+    const apiRecipes = data.meals.slice(0, 12).map(meal => ({
+      name: meal.strMeal,
+      image: meal.strMealThumb,
+      id: meal.idMeal,
+      description: `Delicious ${meal.strMeal} recipe from our AI database`,
+      time: '30-45 min',
+      likes: Math.floor(Math.random() * 1000) + 100,
+      source: 'api'
+    }));
+    
+    container.innerHTML = '';
+    
+    for (let i = 0; i < apiRecipes.length; i++) {
+      const recipe = apiRecipes[i];
+      
+      // Fetch detailed recipe info
+      try {
+        const detailResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipe.id}`);
+        const detailData = await detailResponse.json();
+        
+        if (detailData.meals && detailData.meals[0]) {
+          const meal = detailData.meals[0];
+          recipe.ingredients = [];
+          recipe.steps = meal.strInstructions ? meal.strInstructions.split('.').filter(step => step.trim()) : [];
+          
+          // Extract ingredients
+          for (let j = 1; j <= 20; j++) {
+            const ingredient = meal[`strIngredient${j}`];
+            if (ingredient && ingredient.trim()) {
+              recipe.ingredients.push(ingredient.trim());
+            }
+          }
+        }
+      } catch (error) {
+        console.log('Failed to fetch recipe details for', recipe.name);
+      }
+      
+      const card = createApiRecipeCard(recipe, i);
+      container.appendChild(card);
+    }
+    
+    updateResultsHeader(apiRecipes.length, ingredients);
+    showMessage(`AI found ${apiRecipes.length} recipes from global database!`, 'success');
+    
+  } catch (error) {
+    console.error('API Error:', error);
+    showMessage('API search failed, using enhanced local search', 'info');
+    renderEnhancedLocalSearch(ingredients, container);
+  }
+}
+
+// Create API recipe card
+function createApiRecipeCard(recipe, index) {
+  const card = document.createElement('div');
+  card.className = 'recipe-card';
+  card.style.position = 'relative';
+  
+  const imageDiv = document.createElement('div');
+  imageDiv.className = 'recipe-image';
+  
+  if (recipe.image) {
+    const img = document.createElement('img');
+    img.src = recipe.image;
+    img.alt = recipe.name;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.onerror = function() {
+      imageDiv.innerHTML = '<div class="recipe-emoji">🍽️</div>';
+    };
+    imageDiv.appendChild(img);
+  } else {
+    imageDiv.innerHTML = '<div class="recipe-emoji">🍽️</div>';
+  }
+  
+  // Add API badge
+  const apiBadge = document.createElement('div');
+  apiBadge.innerHTML = '<span style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; position: absolute; top: 1rem; right: 1rem; z-index: 2;"><i class="fas fa-globe"></i> API</span>';
+  card.appendChild(apiBadge);
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'recipe-content';
+  
+  const title = document.createElement('h3');
+  title.className = 'recipe-title';
+  title.textContent = recipe.name;
+  
+  const description = document.createElement('p');
+  description.className = 'recipe-description';
+  description.textContent = recipe.description;
+  
+  const metaDiv = document.createElement('div');
+  metaDiv.className = 'recipe-meta';
+  metaDiv.innerHTML = `
+    <span class="recipe-time"><i class="fas fa-clock"></i> ${recipe.time}</span>
+    <span class="recipe-likes"><i class="fas fa-heart"></i> ${recipe.likes}</span>
+  `;
+  
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'recipe-actions';
+  
+  const viewBtn = document.createElement('button');
+  viewBtn.className = 'btn btn-primary';
+  viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Recipe';
+  viewBtn.addEventListener('click', () => viewRecipe(recipe));
+  
+  actionsDiv.appendChild(viewBtn);
+  
+  contentDiv.appendChild(title);
+  contentDiv.appendChild(description);
+  contentDiv.appendChild(metaDiv);
+  contentDiv.appendChild(actionsDiv);
+  
+  card.appendChild(imageDiv);
+  card.appendChild(contentDiv);
+  
+  return card;
+}
+
+// Enhanced local search fallback
+function renderEnhancedLocalSearch(ingredients, container) {
+  const searchTerms = ingredients.toLowerCase().split(',').map(term => term.trim());
+  const enhancedRecipes = recipes.filter(recipe => {
+    const recipeIngredients = (recipe.ingredients || []).join(' ').toLowerCase();
+    const recipeName = (recipe.name || '').toLowerCase();
+    
+    return searchTerms.some(term => 
+      recipeIngredients.includes(term) || 
+      recipeName.includes(term)
+    );
+  });
+  
+  container.innerHTML = '';
+  
+  if (enhancedRecipes.length === 0) {
+    container.innerHTML = '<div class="no-results">No recipes found. Try different ingredients!</div>';
+    return;
+  }
+  
+  enhancedRecipes.slice(0, 8).forEach((recipe, index) => {
+    const card = createRecipeCard(recipe, index, 'enhanced');
+    container.appendChild(card);
+  });
+  
+  updateResultsHeader(enhancedRecipes.length, ingredients);
 }
 
 // Update results header
