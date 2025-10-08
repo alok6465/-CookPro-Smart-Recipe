@@ -1243,7 +1243,7 @@ input[type="file"]:hover {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.9);
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
@@ -1251,11 +1251,7 @@ input[type="file"]:hover {
   backdrop-filter: blur(10px);
 }
 
-.recipe-modal.active {
-  display: flex;
-}
-
-.modal-content {
+.recipe-modal-content {
   background: var(--bg-card);
   border-radius: var(--border-radius);
   max-width: 900px;
@@ -1266,6 +1262,320 @@ input[type="file"]:hover {
   box-shadow: var(--shadow-hover);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.recipe-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-secondary);
+}
+
+.recipe-modal-header h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.recipe-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-modal-close:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.recipe-modal-body {
+  padding: 2rem;
+}
+
+.recipe-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.recipe-image-large {
+  width: 100%;
+  height: 250px;
+  background: var(--gradient-primary);
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  overflow: hidden;
+}
+
+.recipe-image-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-emoji-large {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+}
+
+.recipe-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.recipe-meta-large {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.recipe-meta-large span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.recipe-ingredients,
+.recipe-steps,
+.recipe-benefits {
+  margin-bottom: 2rem;
+}
+
+.recipe-ingredients h3,
+.recipe-steps h3,
+.recipe-benefits h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recipe-ingredients ul,
+.recipe-benefits ul {
+  list-style: none;
+  padding: 0;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+}
+
+.recipe-ingredients li,
+.recipe-benefits li {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid var(--accent);
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+.recipe-steps ol {
+  list-style: none;
+  counter-reset: step-counter;
+  padding: 0;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+}
+
+.recipe-steps li {
+  counter-increment: step-counter;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  padding-left: 4rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+}
+
+.recipe-steps li::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  background: var(--accent);
+  color: var(--text-primary);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.recipe-comments {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2rem;
+}
+
+.recipe-comments h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.comment-form {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.comment-form textarea {
+  flex: 1;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.comment {
+  background: var(--bg-secondary);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.comment-date {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.comment-text {
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.no-comments {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 2rem;
+  font-style: italic;
+}
+
+/* Message Toast */
+.message-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  animation: slideInRight 0.3s ease-out;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.message-toast.success {
+  background: var(--green);
+}
+
+.message-toast.error {
+  background: var(--accent);
+}
+
+.message-toast.info {
+  background: #2196F3;
+}
+
+.message-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Like and Save Button States */
+.like-btn.liked {
+  background: var(--accent);
+  color: white;
+}
+
+.save-btn.saved {
+  background: var(--green);
+  color: white;
+}
+
+/* Loading States */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.loading i {
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+
+.no-results {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+/* Results Container */
+#recipesContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+#resultsHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+#resultsHeader h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+#resultsHeader p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+
 
 .modal-header {
   position: relative;

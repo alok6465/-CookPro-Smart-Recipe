@@ -44,6 +44,24 @@
         </a>
       </div>
       
+      <div class="nav-auth" id="navAuth">
+        <div class="user-menu" id="userMenu" style="display: none;">
+          <div class="user-avatar" onclick="toggleUserDropdown()">
+            <i class="fas fa-user-circle"></i>
+            <span id="userName">User</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <a href="#" onclick="viewProfile()"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" onclick="viewSettings()"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="loginBtn" onclick="openAuthModal()">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+      </div>
+      
       <div class="hamburger" id="hamburger">
         <span></span>
         <span></span>
@@ -167,6 +185,97 @@
     </div>
   </main>
 
+  <!-- Auth Modal -->
+  <div id="authModal" class="auth-modal">
+    <div class="auth-modal-content">
+      <div class="auth-modal-header">
+        <h2 id="authModalTitle">Welcome to CookPro</h2>
+        <button class="auth-modal-close" onclick="closeAuthModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="auth-modal-body">
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form">
+          <div class="auth-form-header">
+            <h3>Sign In</h3>
+            <p>Welcome back! Please sign in to your account.</p>
+          </div>
+          
+          <form id="loginFormElement">
+            <div class="form-group">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full">
+              <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+          </form>
+          
+          <div class="auth-divider">
+            <span>or</span>
+          </div>
+          
+          <button class="btn btn-google" onclick="signInWithGoogle()">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+          
+          <div class="auth-switch">
+            <p>Don't have an account? <a href="#" onclick="showSignupForm()">Sign up</a></p>
+          </div>
+        </div>
+        
+        <!-- Signup Form -->
+        <div id="signupForm" class="auth-form" style="display: none;">
+          <div class="auth-form-header">
+            <h3>Create Account</h3>
+            <p>Join CookPro and discover amazing recipes!</p>
+          </div>
+          
+          <form id="signupFormElement">
+            <div class="form-group">
+              <label for="signupName">Full Name</label>
+              <input type="text" id="signupName" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="signupEmail">Email</label>
+              <input type="email" id="signupEmail" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="signupPassword">Password</label>
+              <input type="password" id="signupPassword" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full">
+              <i class="fas fa-user-plus"></i> Create Account
+            </button>
+          </form>
+          
+          <div class="auth-divider">
+            <span>or</span>
+          </div>
+          
+          <button class="btn btn-google" onclick="signInWithGoogle()">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+          
+          <div class="auth-switch">
+            <p>Already have an account? <a href="#" onclick="showLoginForm()">Sign in</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
@@ -199,18 +308,32 @@
     </div>
   </footer>
 
-  <script src="assets/js/script.js"></script>
-  <script src="assets/js/auth.js"></script>
-  <script src="assets/js/pdf-generator.js"></script>
   <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
-<!-- App Scripts -->
-<script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/firebase-auth.js"></script>
-<script src="assets/js/script.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- App Scripts -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/firebase-auth.js"></script>
+  <script src="assets/js/script.js"></script>
+  
+  <script>
+    // Add ingredient to input field
+    function addIngredient(ingredient) {
+      const input = document.getElementById('ingredients');
+      const currentValue = input.value.trim();
+      
+      if (currentValue) {
+        input.value = currentValue + ', ' + ingredient;
+      } else {
+        input.value = ingredient;
+      }
+      
+      input.focus();
+      showMessage(`Added ${ingredient} to your ingredients!`, 'success');
+    }
+  </script>
 
 </body>
 </html>

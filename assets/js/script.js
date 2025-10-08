@@ -296,7 +296,621 @@ function searchAI() {
   }
 }
 
+// Enhanced render results
+function renderResults() {
+  const searchMode = localStorage.getItem('searchMode') || 'offline';
+  const ingredients = localStorage.getItem('userIngredients') || '';
+  
+  if (searchMode === 'offline') {
+    renderOfflineResults(ingredients);
+  } else {
+    renderOnlineResults(ingredients);
+  }
+}
+
+// Render offline results
+function renderOfflineResults(ingredients) {
+  const container = document.getElementById('recipesContainer');
+  if (!container) return;
+  
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading recipes...</div>';
+  
+  if (recipes.length === 0) {
+    container.innerHTML = '<div class="no-results">No recipes found. Please try different ingredients.</div>';
+    return;
+  }
+  
+  let filteredRecipes = recipes;
+  
+  if (ingredients.trim()) {
+    const searchTerms = ingredients.toLowerCase().split(',').map(term => term.trim());
+    filteredRecipes = recipes.filter(recipe => {
+      const recipeIngredients = (recipe.ingredients || []).join(' ').toLowerCase();
+      const recipeName = (recipe.name || '').toLowerCase();
+      const recipeDesc = (recipe.description || '').toLowerCase();
+      
+      return searchTerms.some(term => 
+        recipeIngredients.includes(term) || 
+        recipeName.includes(term) || 
+        recipeDesc.includes(term)
+      );
+    });
+  }
+  
+  if (filteredRecipes.length === 0) {
+    container.innerHTML = '<div class="no-results">No recipes found with those ingredients. Try different ones!</div>';
+    return;
+  }
+  
+  container.innerHTML = '';
+  filteredRecipes.forEach((recipe, index) => {
+    const card = createRecipeCard(recipe, index, 'offline');
+    container.appendChild(card);
+  });
+  
+  updateResultsHeader(filteredRecipes.length, ingredients);
+}
+
+// Render online results (placeholder)
+function renderOnlineResults(ingredients) {
+  const container = document.getElementById('recipesContainer');
+  if (!container) return;
+  
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Searching online recipes...</div>';
+  
+  setTimeout(() => {
+    container.innerHTML = '<div class="no-results">Online search coming soon! Try offline search for now.</div>';
+  }, 2000);
+}
+
+// Update results header
+function updateResultsHeader(count, ingredients) {
+  const header = document.getElementById('resultsHeader');
+  if (header) {
+    header.innerHTML = `
+      <h2>Found ${count} recipes</h2>
+      <p>Showing results for: <strong>${ingredients || 'all recipes'}</strong></p>
+    `;
+  }
+}
+
+// Enhanced recipe card creation
+function createRecipeCard(recipe, index, mode) {
+  const card = document.createElement('div');
+  card.className = 'recipe-card';
+  card.setAttribute('data-recipe-id', recipe.name || index);
+  
+  const imageDiv = document.createElement('div');
+  imageDiv.className = 'recipe-image';
+  
+  if (recipe.image && recipe.image.startsWith('assets/')) {
+    const img = document.createElement('img');
+    img.src = recipe.image;
+    img.alt = recipe.name || 'Recipe';
+    img.onerror = function() {
+      this.style.display = 'none';
+      imageDiv.innerHTML = '<div class="recipe-emoji">🍛</div>';
+    };
+    imageDiv.appendChild(img);
+  } else {
+    imageDiv.innerHTML = '<div class="recipe-emoji">🍛</div>';
+  }
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'recipe-content';
+  
+  const title = document.createElement('h3');
+  title.className = 'recipe-title';
+  title.textContent = recipe.name || recipe.RecipeName || 'Delicious Recipe';
+  
+  const description = document.createElement('p');
+  description.className = 'recipe-description';
+  description.textContent = recipe.description || 'A wonderful recipe to try';
+  
+  const metaDiv = document.createElement('div');
+  metaDiv.className = 'recipe-meta';
+  metaDiv.innerHTML = `
+    <span class="recipe-time"><i class="fas fa-clock"></i> ${recipe.time || '30 min'}</span>
+    <span class="recipe-likes"><i class="fas fa-heart"></i> ${recipe.likes || 0}</span>
+  `;
+  
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'recipe-actions';
+  
+  const viewBtn = document.createElement('button');
+  viewBtn.className = 'btn btn-primary';
+  viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Recipe';
+  viewBtn.addEventListener('click', () => viewRecipe(recipe));
+  
+  const likeBtn = document.createElement('button');
+  likeBtn.className = 'btn btn-outline like-btn';
+  likeBtn.innerHTML = '<i class="fas fa-heart"></i>';
+  likeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleLike(recipe, likeBtn);
+  });
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-outline save-btn';
+  saveBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+  saveBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    saveRecipe(recipe, saveBtn);
+  });
+  
+  actionsDiv.appendChild(viewBtn);
+  actionsDiv.appendChild(likeBtn);
+  actionsDiv.appendChild(saveBtn);
+  
+  contentDiv.appendChild(title);
+  contentDiv.appendChild(description);
+  contentDiv.appendChild(metaDiv);
+  contentDiv.appendChild(actionsDiv);
+  
+  card.appendChild(imageDiv);
+  card.appendChild(contentDiv);
+  
+  return card;
+}
+
+// View recipe details
+function viewRecipe(recipe) {
+  currentRecipe = recipe;
+  
+  // Track view
+  if (typeof FirebaseDB !== 'undefined' && typeof AuthManager !== 'undefined') {
+    const userId = AuthManager.getCurrentUserId();
+    FirebaseDB.trackRecipeView(recipe.name || 'unknown', userId);
+  }
+  
+  // Create modal
+  const modal = document.createElement('div');
+  modal.className = 'recipe-modal';
+  modal.innerHTML = `
+    <div class="recipe-modal-content">
+      <div class="recipe-modal-header">
+        <h2>${recipe.name || 'Recipe'}</h2>
+        <button class="recipe-modal-close" onclick="closeRecipeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="recipe-modal-body">
+        <div class="recipe-details">
+          <div class="recipe-image-large">
+            ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}" onerror="this.style.display='none'">` : '<div class="recipe-emoji-large">🍛</div>'}
+          </div>
+          <div class="recipe-info">
+            <p class="recipe-description">${recipe.description || 'A delicious recipe'}</p>
+            <div class="recipe-meta-large">
+              <span><i class="fas fa-clock"></i> ${recipe.time || '30 min'}</span>
+              <span><i class="fas fa-heart"></i> ${recipe.likes || 0} likes</span>
+              <span><i class="fas fa-eye"></i> Views</span>
+            </div>
+            ${recipe.youtube ? `<a href="${recipe.youtube}" target="_blank" class="btn btn-primary"><i class="fab fa-youtube"></i> Watch Video</a>` : ''}
+          </div>
+        </div>
+        
+        <div class="recipe-ingredients">
+          <h3>Ingredients</h3>
+          <ul>
+            ${(recipe.ingredients || []).map(ingredient => `<li>${ingredient}</li>`).join('')}
+          </ul>
+        </div>
+        
+        <div class="recipe-steps">
+          <h3>Instructions</h3>
+          <ol>
+            ${(recipe.steps || []).map(step => `<li>${step}</li>`).join('')}
+          </ol>
+        </div>
+        
+        ${recipe.benefits ? `
+          <div class="recipe-benefits">
+            <h3>Health Benefits</h3>
+            <ul>
+              ${recipe.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        
+        <div class="recipe-comments">
+          <h3>Comments</h3>
+          <div id="commentsContainer">
+            <div class="loading">Loading comments...</div>
+          </div>
+          <div class="comment-form">
+            <textarea id="commentText" placeholder="Add a comment..."></textarea>
+            <button onclick="addComment()" class="btn btn-primary">Post Comment</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+  
+  // Load comments
+  loadRecipeComments(recipe.name || 'unknown');
+}
+
+// Close recipe modal
+function closeRecipeModal() {
+  const modal = document.querySelector('.recipe-modal');
+  if (modal) {
+    modal.remove();
+    document.body.style.overflow = 'auto';
+  }
+}
+
+// Toggle like
+function toggleLike(recipe, button) {
+  if (typeof AuthManager === 'undefined' || !AuthManager.isUserLoggedIn()) {
+    showMessage('Please login to like recipes!', 'info');
+    return;
+  }
+  
+  const userId = AuthManager.getCurrentUserId();
+  const recipeId = recipe.name || 'unknown';
+  
+  if (typeof FirebaseDB !== 'undefined') {
+    FirebaseDB.toggleRecipeLike(userId, recipeId).then(result => {
+      if (result.error) {
+        showMessage('Error updating like status', 'error');
+        return;
+      }
+      
+      if (result.liked) {
+        button.classList.add('liked');
+        button.innerHTML = '<i class="fas fa-heart"></i>';
+        showMessage('Recipe liked!', 'success');
+      } else {
+        button.classList.remove('liked');
+        button.innerHTML = '<i class="far fa-heart"></i>';
+        showMessage('Recipe unliked!', 'success');
+      }
+    });
+  } else {
+    // Fallback for offline mode
+    button.classList.toggle('liked');
+    const isLiked = button.classList.contains('liked');
+    button.innerHTML = isLiked ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+    showMessage(isLiked ? 'Recipe liked!' : 'Recipe unliked!', 'success');
+  }
+}
+
+// Save recipe
+function saveRecipe(recipe, button) {
+  if (typeof AuthManager === 'undefined' || !AuthManager.isUserLoggedIn()) {
+    showMessage('Please login to save recipes!', 'info');
+    return;
+  }
+  
+  const userId = AuthManager.getCurrentUserId();
+  
+  if (typeof FirebaseDB !== 'undefined') {
+    FirebaseDB.saveRecipe(userId, recipe).then(success => {
+      if (success) {
+        button.classList.add('saved');
+        button.innerHTML = '<i class="fas fa-bookmark"></i>';
+        showMessage('Recipe saved!', 'success');
+      } else {
+        showMessage('Error saving recipe', 'error');
+      }
+    });
+  } else {
+    // Fallback for offline mode
+    const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes') || '[]');
+    savedRecipes.push(recipe);
+    localStorage.setItem('savedRecipes', JSON.stringify(savedRecipes));
+    
+    button.classList.add('saved');
+    button.innerHTML = '<i class="fas fa-bookmark"></i>';
+    showMessage('Recipe saved locally!', 'success');
+  }
+}
+
+// Load recipe comments
+function loadRecipeComments(recipeId) {
+  const container = document.getElementById('commentsContainer');
+  if (!container) return;
+  
+  if (typeof FirebaseDB !== 'undefined') {
+    FirebaseDB.getRecipeComments(recipeId).then(comments => {
+      if (comments.length === 0) {
+        container.innerHTML = '<div class="no-comments">No comments yet. Be the first to comment!</div>';
+        return;
+      }
+      
+      container.innerHTML = comments.map(comment => `
+        <div class="comment">
+          <div class="comment-header">
+            <strong>${comment.userName || 'Anonymous'}</strong>
+            <span class="comment-date">${formatDate(comment.createdAt)}</span>
+          </div>
+          <div class="comment-text">${comment.comment}</div>
+        </div>
+      `).join('');
+    });
+  } else {
+    container.innerHTML = '<div class="no-comments">Comments feature requires login</div>';
+  }
+}
+
+// Add comment
+function addComment() {
+  if (typeof AuthManager === 'undefined' || !AuthManager.isUserLoggedIn()) {
+    showMessage('Please login to comment!', 'info');
+    return;
+  }
+  
+  const commentText = document.getElementById('commentText');
+  if (!commentText || !commentText.value.trim()) {
+    showMessage('Please enter a comment', 'error');
+    return;
+  }
+  
+  const userId = AuthManager.getCurrentUserId();
+  const user = AuthManager.getCurrentUser();
+  const recipeId = currentRecipe?.name || 'unknown';
+  
+  if (typeof FirebaseDB !== 'undefined') {
+    FirebaseDB.addRecipeComment(recipeId, userId, user.displayName || 'Anonymous', commentText.value.trim())
+      .then(success => {
+        if (success) {
+          commentText.value = '';
+          showMessage('Comment added!', 'success');
+          loadRecipeComments(recipeId);
+        } else {
+          showMessage('Error adding comment', 'error');
+        }
+      });
+  }
+}
+
+// Format date
+function formatDate(timestamp) {
+  if (!timestamp) return 'Just now';
+  
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  const now = new Date();
+  const diff = now - date;
+  
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  return `${Math.floor(diff / 86400000)}d ago`;
+}
+
+// Show message function
+function showMessage(message, type = 'info') {
+  const existingMessages = document.querySelectorAll('.message-toast');
+  existingMessages.forEach(msg => msg.remove());
+  
+  const toast = document.createElement('div');
+  toast.className = `message-toast ${type}`;
+  toast.innerHTML = `
+    <div class="message-content">
+      <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+      <span>${message}</span>
+    </div>
+  `;
+  
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    background: ${type === 'success' ? '#46d369' : type === 'error' ? '#e50914' : '#2196F3'};
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideInRight 0.3s ease-out;
+    max-width: 300px;
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideOutRight 0.3s ease-in';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Add lazy loading for images
+function addLazyLoading() {
+  if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.classList.remove('lazy');
+          imageObserver.unobserve(img);
+        }
+      });
+    });
+    
+    document.querySelectorAll('img[data-src]').forEach(img => {
+      imageObserver.observe(img);
+    });
+  }
+}
+
+// Load today's menu with actual recipes
+function loadTodaysMenu() {
+  const meals = ['breakfast', 'lunch', 'dinner'];
+  const mealRecipes = {
+    breakfast: { name: 'Masala Dosa', desc: 'Crispy South Indian crepe with spiced potato filling', time: '45 mins' },
+    lunch: { name: 'Rajma Chawal', desc: 'Kidney beans curry with steamed rice', time: '60 mins' },
+    dinner: { name: 'Paneer Butter Masala', desc: 'Rich and creamy paneer in tomato gravy', time: '40 mins' }
+  };
+  
+  meals.forEach(meal => {
+    const titleEl = document.getElementById(`${meal}Title`);
+    const descEl = document.getElementById(`${meal}Desc`);
+    const timeEl = document.getElementById(`${meal}Time`);
+    
+    const recipe = mealRecipes[meal];
+    if (titleEl) titleEl.textContent = recipe.name;
+    if (descEl) descEl.textContent = recipe.desc;
+    if (timeEl) timeEl.textContent = `⏱️ ${recipe.time}`;
+  });
+}
+
+// Load recent comments
+function loadRecentComments() {
+  const container = document.getElementById('recentCommentsList');
+  if (!container) return;
+  
+  if (typeof FirebaseDB !== 'undefined') {
+    // Load from Firebase
+    FirebaseDB.getReviews().then(reviews => {
+      if (reviews.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No recent comments</div>';
+        return;
+      }
+      
+      container.innerHTML = reviews.slice(0, 5).map(review => `
+        <div class="comment-card" style="min-width: 300px; background: var(--bg-card); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <strong style="color: var(--text-primary);">${review.userName || 'Anonymous'}</strong>
+            <span style="color: var(--text-secondary); font-size: 0.9rem;">${formatDate(review.createdAt)}</span>
+          </div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">${review.comment || review.review}</p>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span style="color: var(--accent);">⭐ ${review.rating || 5}/5</span>
+            <span style="color: var(--text-secondary); font-size: 0.9rem;">${review.recipeName || 'Recipe'}</span>
+          </div>
+        </div>
+      `).join('');
+    });
+  } else {
+    // Fallback with sample comments
+    const sampleComments = [
+      { userName: 'Priya S.', comment: 'Amazing Butter Chicken recipe! My family loved it.', rating: 5, recipeName: 'Butter Chicken', time: '2h ago' },
+      { userName: 'Raj K.', comment: 'Perfect Dal Tadka. Just like my mom makes!', rating: 5, recipeName: 'Dal Tadka', time: '4h ago' },
+      { userName: 'Meera P.', comment: 'The Biryani turned out fantastic. Great instructions!', rating: 4, recipeName: 'Vegetable Biryani', time: '6h ago' }
+    ];
+    
+    container.innerHTML = sampleComments.map(comment => `
+      <div class="comment-card" style="min-width: 300px; background: var(--bg-card); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <strong style="color: var(--text-primary);">${comment.userName}</strong>
+          <span style="color: var(--text-secondary); font-size: 0.9rem;">${comment.time}</span>
+        </div>
+        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">${comment.comment}</p>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <span style="color: var(--accent);">⭐ ${comment.rating}/5</span>
+          <span style="color: var(--text-secondary); font-size: 0.9rem;">${comment.recipeName}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
 // Enhanced render results with smart search
+async function renderResults() {
+  const mode = localStorage.getItem('searchMode') || 'offline';
+  const ingredients = localStorage.getItem('userIngredients');
+  const container = document.getElementById('recipeResults');
+  
+  if (!container) return;
+  
+  container.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent);"></i></div>';
+  
+  if (mode === 'offline') {
+    await loadJSONRecipes();
+    let displayRecipes = recipes;
+    
+    if (ingredients && typeof filterRecipesByIngredients === 'function') {
+      displayRecipes = filterRecipesByIngredients(recipes, ingredients);
+      console.log(`🔍 Found ${displayRecipes.length} matching recipes for: "${ingredients}"`);
+    }
+    
+    container.innerHTML = '';
+    displayRecipes.slice(0, 12).forEach((recipe, index) => {
+      const card = createRecipeCard(recipe, index, 'offline');
+      container.appendChild(card);
+    });
+    
+    if (displayRecipes.length === 0) {
+      container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No recipes found. Try different ingredients!</div>';
+    }
+  } else {
+    try {
+      const cleanedIngredients = typeof parseSearchIngredients === 'function' 
+        ? parseSearchIngredients(ingredients).join(' ') 
+        : ingredients;
+      
+      const apiUrl = getApiUrl(cleanedIngredients);
+      console.log('🌐 API Request:', apiUrl);
+      
+      const apiRecipes = typeof fetchWithRetry === 'function'
+        ? await fetchWithRetry(apiUrl)
+        : await (await fetch(apiUrl)).json();
+      
+      currentApiRecipes = apiRecipes;
+      container.innerHTML = '';
+      
+      if (apiRecipes && apiRecipes.length > 0) {
+        apiRecipes.slice(0, 12).forEach((recipe, index) => {
+          const card = createRecipeCard(recipe, index, 'online');
+          container.appendChild(card);
+        });
+      } else {
+        container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No AI recipes found. Try different ingredients!</div>';
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+          <p>API temporarily unavailable</p>
+          <button onclick="localStorage.setItem('searchMode', 'offline'); renderResults();" class="btn btn-primary" style="margin-top: 1rem;">
+            Try Offline Mode
+          </button>
+        </div>
+      `;
+    }
+  }
+}
+
+// Performance optimizations
+function addLazyLoading() {
+  const images = document.querySelectorAll('img[data-src]');
+  const imageObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        img.src = img.dataset.src;
+        img.classList.remove('lazy');
+        imageObserver.unobserve(img);
+      }
+    });
+  });
+  
+  images.forEach(img => imageObserver.observe(img));
+}
+
+// Safe message display
+function showMessage(message, type = 'info') {
+  const existingMessages = document.querySelectorAll('.temp-message');
+  existingMessages.forEach(msg => msg.remove());
+
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'temp-message';
+  messageDiv.textContent = message;
+  messageDiv.style.cssText = `
+    position: fixed; top: 20px; right: 20px; z-index: 10000;
+    padding: 1rem 2rem; border-radius: 8px; color: white;
+    background: ${type === 'success' ? '#46d369' : type === 'error' ? '#e50914' : '#0070f3'};
+    animation: slideInRight 0.3s ease-out;
+  `;
+  
+  document.body.appendChild(messageDiv);
+  setTimeout(() => messageDiv.remove(), 3000);
+}with smart search
 async function renderResults() {
   const mode = localStorage.getItem('searchMode') || 'offline';
   const ingredients = localStorage.getItem('userIngredients');
