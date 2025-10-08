@@ -467,92 +467,150 @@ function renderOfflineResults(ingredients) {
   }, 500);
 }
 
-// Render online results with real API
+// Render online results with Render API
 async function renderOnlineResults(ingredients) {
   const container = document.getElementById('recipesContainer');
   if (!container) return;
   
-  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> AI is searching thousands of recipes...</div>';
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> AI is searching recipe database...</div>';
   
   try {
-    // Use free recipe API
-    const cleanIngredients = ingredients.replace(/[^a-zA-Z,\s]/g, '').trim();
-    const apiUrl = `https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(cleanIngredients.split(',')[0].trim())}`;
+    // Use your Render API
+    const renderApiUrl = `https://recipe-api-vert.vercel.app/api/recipes?ingredients=${encodeURIComponent(ingredients)}`;
     
-    const response = await fetch(apiUrl);
+    const response = await fetch(renderApiUrl);
     const data = await response.json();
     
-    if (!data.meals || data.meals.length === 0) {
-      // Fallback to Edamam API
-      const edamamUrl = `https://api.edamam.com/search?q=${encodeURIComponent(ingredients)}&app_id=demo&app_key=demo&from=0&to=12`;
+    if (!data.success || !data.recipes || data.recipes.length === 0) {
+      // Fallback to TheMealDB
+      const cleanIngredients = ingredients.replace(/[^a-zA-Z,\s]/g, '').trim();
+      const mealDbUrl = `https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(cleanIngredients.split(',')[0].trim())}`;
       
       try {
-        const edamamResponse = await fetch(edamamUrl);
-        const edamamData = await edamamResponse.json();
+        const mealDbResponse = await fetch(mealDbUrl);
+        const mealDbData = await mealDbResponse.json();
         
-        if (edamamData.hits && edamamData.hits.length > 0) {
-          renderEdamamRecipes(edamamData.hits, container, ingredients);
+        if (mealDbData.meals && mealDbData.meals.length > 0) {
+          renderMealDbRecipes(mealDbData.meals, container, ingredients);
           return;
         }
       } catch (error) {
-        console.log('Edamam API failed, using fallback');
+        console.log('MealDB API failed, using local search');
       }
       
-      // Final fallback to local enhanced search
       renderEnhancedLocalSearch(ingredients, container);
       return;
     }
     
-    // Process TheMealDB results
-    const apiRecipes = data.meals.slice(0, 12).map(meal => ({
-      name: meal.strMeal,
-      image: meal.strMealThumb,
-      id: meal.idMeal,
-      description: `Delicious ${meal.strMeal} recipe from our AI database`,
-      time: '30-45 min',
-      likes: Math.floor(Math.random() * 1000) + 100,
-      source: 'api'
-    }));
+    // Process Render API results
+    const apiRecipes = data.recipes.slice(0, 12);
     
     container.innerHTML = '';
     
-    for (let i = 0; i < apiRecipes.length; i++) {
-      const recipe = apiRecipes[i];
-      
-      // Fetch detailed recipe info
-      try {
-        const detailResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipe.id}`);
-        const detailData = await detailResponse.json();
-        
-        if (detailData.meals && detailData.meals[0]) {
-          const meal = detailData.meals[0];
-          recipe.ingredients = [];
-          recipe.steps = meal.strInstructions ? meal.strInstructions.split('.').filter(step => step.trim()) : [];
-          
-          // Extract ingredients
-          for (let j = 1; j <= 20; j++) {
-            const ingredient = meal[`strIngredient${j}`];
-            if (ingredient && ingredient.trim()) {
-              recipe.ingredients.push(ingredient.trim());
-            }
-          }
-        }
-      } catch (error) {
-        console.log('Failed to fetch recipe details for', recipe.name);
-      }
-      
-      const card = createApiRecipeCard(recipe, i);
+    apiRecipes.forEach((recipe, index) => {
+      const card = createRenderApiRecipeCard(recipe, index);
       container.appendChild(card);
-    }
+    });
     
     updateResultsHeader(apiRecipes.length, ingredients);
-    showMessage(`AI found ${apiRecipes.length} recipes from global database!`, 'success');
+    showMessage(`AI found ${apiRecipes.length} recipes from Render API!`, 'success');
     
   } catch (error) {
-    console.error('API Error:', error);
-    showMessage('API search failed, using enhanced local search', 'info');
+    console.error('Render API Error:', error);
+    showMessage('Render API unavailable, using fallback', 'info');
     renderEnhancedLocalSearch(ingredients, container);
   }
+}
+
+// Create Render API recipe card
+function createRenderApiRecipeCard(recipe, index) {
+  const card = document.createElement('div');
+  card.className = 'recipe-card';
+  card.style.position = 'relative';
+  
+  const imageDiv = document.createElement('div');
+  imageDiv.className = 'recipe-image';
+  
+  if (recipe.image || recipe.imageUrl) {
+    const img = document.createElement('img');
+    img.src = recipe.image || recipe.imageUrl;
+    img.alt = recipe.name || recipe.title;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.onerror = function() {
+      imageDiv.innerHTML = '<div class="recipe-emoji">🍛</div>';
+    };
+    imageDiv.appendChild(img);
+  } else {
+    imageDiv.innerHTML = '<div class="recipe-emoji">🍛</div>';
+  }
+  
+  // Add Render API badge
+  const apiBadge = document.createElement('div');
+  apiBadge.innerHTML = '<span style="background: linear-gradient(45deg, #e50914, #ff6b35); color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; position: absolute; top: 1rem; right: 1rem; z-index: 2;"><i class="fas fa-cloud"></i> API</span>';
+  card.appendChild(apiBadge);
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'recipe-content';
+  
+  const title = document.createElement('h3');
+  title.className = 'recipe-title';
+  title.textContent = recipe.name || recipe.title || 'Delicious Recipe';
+  
+  const description = document.createElement('p');
+  description.className = 'recipe-description';
+  description.textContent = recipe.description || recipe.summary || 'A wonderful recipe from our API';
+  
+  const metaDiv = document.createElement('div');
+  metaDiv.className = 'recipe-meta';
+  metaDiv.innerHTML = `
+    <span class="recipe-time"><i class="fas fa-clock"></i> ${recipe.cookTime || recipe.time || '30 min'}</span>
+    <span class="recipe-likes"><i class="fas fa-heart"></i> ${recipe.likes || Math.floor(Math.random() * 500) + 50}</span>
+  `;
+  
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'recipe-actions';
+  
+  const viewBtn = document.createElement('button');
+  viewBtn.className = 'btn btn-primary';
+  viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Recipe';
+  viewBtn.addEventListener('click', () => viewRecipe(recipe));
+  
+  actionsDiv.appendChild(viewBtn);
+  
+  contentDiv.appendChild(title);
+  contentDiv.appendChild(description);
+  contentDiv.appendChild(metaDiv);
+  contentDiv.appendChild(actionsDiv);
+  
+  card.appendChild(imageDiv);
+  card.appendChild(contentDiv);
+  
+  return card;
+}
+
+// Fallback MealDB renderer
+function renderMealDbRecipes(meals, container, ingredients) {
+  const apiRecipes = meals.slice(0, 8).map(meal => ({
+    name: meal.strMeal,
+    image: meal.strMealThumb,
+    id: meal.idMeal,
+    description: `Delicious ${meal.strMeal} recipe`,
+    time: '30-45 min',
+    likes: Math.floor(Math.random() * 1000) + 100,
+    source: 'mealdb'
+  }));
+  
+  container.innerHTML = '';
+  
+  apiRecipes.forEach((recipe, index) => {
+    const card = createApiRecipeCard(recipe, index);
+    container.appendChild(card);
+  });
+  
+  updateResultsHeader(apiRecipes.length, ingredients);
+  showMessage(`Found ${apiRecipes.length} recipes from MealDB!`, 'success');
 }
 
 // Create API recipe card
